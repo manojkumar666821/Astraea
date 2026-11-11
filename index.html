@@ -3,35 +3,27 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Astraea - Astronaut EVA Cuff HUD | Team Victorious</title>
+  <title>Astraea - Astronaut EVA Cuff HUD & Cabin Telemetry</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Primary Chart.js CDN with failover -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
 
   <style>
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: 'Poppins', sans-serif !important;
+      font-family: 'Poppins', sans-serif;
     }
 
     body {
-      background-color: #040711;
+      background-color: #060913;
       color: #e2e8f0;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
-      overflow-x: hidden;
-      font-family: 'Poppins', sans-serif !important;
-    }
-
-    /* Clean Poppins class for telemetry numbers */
-    .mono {
-      font-family: 'Poppins', sans-serif !important;
-      font-feature-settings: "tnum";
-      font-variant-numeric: tabular-nums;
     }
 
     /* Top Sticky Alert */
@@ -39,16 +31,15 @@
       display: none;
       position: sticky;
       top: 0;
-      height: 44px;
       z-index: 1000;
-      background: linear-gradient(90deg, #7f1d1d, #dc2626);
+      background: linear-gradient(90deg, #991b1b, #dc2626);
       color: #ffffff;
       padding: 10px 20px;
       text-align: center;
-      font-weight: 700;
+      font-weight: 600;
       font-size: 13px;
       letter-spacing: 0.5px;
-      box-shadow: 0 4px 20px rgba(220, 38, 38, 0.5);
+      box-shadow: 0 4px 15px rgba(220, 38, 38, 0.4);
       animation: pulseAlert 1.2s infinite alternate;
     }
 
@@ -57,11 +48,11 @@
       to { background-color: #ef4444; }
     }
 
-    /* Header: Wearable HUD Framing */
+    /* Header */
     header {
-      background: linear-gradient(180deg, #0a0f1d 0%, #060a14 100%);
+      background-color: #0c1222;
       border-bottom: 1px solid #1e293b;
-      padding: 16px 28px;
+      padding: 18px 32px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -75,67 +66,100 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      font-size: 11px;
-      font-weight: 600;
+      font-size: 12px;
+      font-weight: 500;
       color: #38bdf8;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      margin-bottom: 2px;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
     }
 
     .title-group .sub-tag::before {
       content: "";
       display: inline-block;
-      width: 4px;
+      width: 3px;
       height: 13px;
       background-color: #38bdf8;
       border-radius: 2px;
-      box-shadow: 0 0 8px #38bdf8;
     }
 
     .title-group h1 {
-      font-size: 22px;
+      font-size: 24px;
       font-weight: 700;
       color: #ffffff;
-      letter-spacing: -0.3px;
+      line-height: 1.2;
     }
 
     .title-group p {
-      font-size: 11px;
+      font-size: 12px;
       color: #94a3b8;
+      margin-top: 4px;
+    }
+
+    .title-group p strong {
+      color: #38bdf8;
+      font-weight: 600;
     }
 
     .header-actions {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
       position: relative;
     }
 
-    /* Action Buttons */
     .btn {
-      padding: 8px 14px;
+      padding: 8px 16px;
       border-radius: 6px;
-      font-size: 12px;
-      font-weight: 600;
+      font-size: 13px;
+      font-weight: 500;
       cursor: pointer;
       border: 1px solid transparent;
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
       transition: all 0.2s ease;
     }
 
-    .btn-hardware {
+    .btn-bus {
       background-color: #0f172a;
       color: #94a3b8;
       border-color: #334155;
     }
-    .btn-hardware.connected {
+
+    .btn-bus.listening {
+      background-color: #422006;
+      color: #fde047;
+      border-color: #ca8a04;
+    }
+
+    .btn-bus.streaming {
       background-color: #064e3b;
       color: #34d399;
       border-color: #059669;
-      box-shadow: 0 0 10px rgba(52, 211, 153, 0.3);
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: #64748b;
+    }
+
+    .listening .status-dot {
+      background-color: #fde047;
+      box-shadow: 0 0 8px #fde047;
+      animation: pulseDot 1s infinite alternate;
+    }
+
+    .streaming .status-dot {
+      background-color: #34d399;
+      box-shadow: 0 0 8px #34d399;
+      animation: pulseDot 1.5s infinite alternate;
+    }
+
+    @keyframes pulseDot {
+      from { opacity: 0.4; }
+      to { opacity: 1; }
     }
 
     .btn-primary {
@@ -162,11 +186,11 @@
       position: absolute;
       right: 0;
       top: calc(100% + 6px);
-      background-color: #0c1222;
-      min-width: 250px;
+      background-color: #0f172a;
+      min-width: 260px;
       border: 1px solid #334155;
       border-radius: 8px;
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.7);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
       z-index: 200;
       overflow: hidden;
     }
@@ -183,11 +207,11 @@
       display: flex;
       flex-direction: column;
       gap: 2px;
-      border-bottom: 1px solid #1a2333;
+      border-bottom: 1px solid #1e293b;
     }
 
     .dropdown-content button:hover {
-      background-color: #162032;
+      background-color: #1e293b;
       color: #38bdf8;
     }
 
@@ -202,77 +226,73 @@
 
     /* Main Container */
     main {
-      padding: 16px 28px;
+      padding: 20px 32px;
       flex: 1;
       max-width: 1600px;
       margin: 0 auto;
       width: 100%;
     }
 
-    /* Astronaut Crew Banner */
+    /* Crew Identity Ribbon */
     .crew-ribbon {
-      background: linear-gradient(90deg, #0c1322 0%, #111a2f 100%);
+      background-color: #0c1222;
       border: 1px solid #1e293b;
       border-radius: 8px;
-      padding: 10px 18px;
+      padding: 12px 20px;
+      margin-bottom: 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
       gap: 12px;
-      margin-bottom: 16px;
     }
 
-    .crew-info {
+    .crew-identity {
       display: flex;
       align-items: center;
-      gap: 16px;
-      flex-wrap: wrap;
+      gap: 12px;
     }
 
-    .crew-tag {
+    .crew-identity span.label {
       font-size: 11px;
       color: #64748b;
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
 
-    .crew-name-input {
-      background: transparent;
-      border: none;
-      border-bottom: 1px dashed #38bdf8;
-      color: #ffffff;
+    .crew-identity input {
+      background-color: #060913;
+      border: 1px solid #334155;
+      color: #38bdf8;
       font-weight: 600;
-      font-size: 13px;
-      padding: 2px 4px;
-      outline: none;
-      width: 180px;
-    }
-
-    .crew-name-input:focus {
-      border-bottom: 1px solid #38bdf8;
-      background-color: #0b1120;
-    }
-
-    .cuff-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 11px;
-      background-color: #1e293b;
+      font-size: 14px;
       padding: 4px 10px;
       border-radius: 4px;
-      color: #38bdf8;
-      border: 1px solid #334155;
+      outline: none;
+      width: 200px;
     }
 
-    /* Strict 2x2 Matrix Grid (No combined graphs) */
+    .crew-identity input:focus {
+      border-color: #38bdf8;
+    }
+
+    .crew-metadata {
+      display: flex;
+      gap: 20px;
+      font-size: 12px;
+      color: #94a3b8;
+    }
+
+    .crew-metadata strong {
+      color: #cbd5e1;
+    }
+
+    /* 2x2 Matrix Grid with integrated values */
     .charts-matrix {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      grid-template-rows: repeat(2, auto);
-      gap: 14px;
-      margin-bottom: 16px;
+      gap: 16px;
+      margin-bottom: 20px;
     }
 
     @media (max-width: 900px) {
@@ -280,193 +300,135 @@
     }
 
     .chart-box {
-      background-color: #0a0e1a;
-      border: 1px solid #1a2333;
+      background-color: #0c1222;
+      border: 1px solid #1e293b;
       border-radius: 8px;
-      padding: 14px 18px;
+      padding: 16px 20px;
       display: flex;
       flex-direction: column;
       position: relative;
-      transition: all 0.25s ease;
+      transition: border-color 0.2s, background-color 0.2s;
     }
 
     .chart-box.alert-border {
       border-color: #ef4444;
-      background-color: #1e0d12;
-      box-shadow: 0 0 16px rgba(239, 68, 68, 0.3);
+      background-color: #1f1015;
     }
 
     .chart-header {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      margin-bottom: 8px;
+      margin-bottom: 12px;
     }
 
-    .chart-title-area h3 {
+    .chart-header .title-area h3 {
       font-size: 13px;
       font-weight: 600;
       color: #cbd5e1;
-      display: flex;
-      align-items: center;
-      gap: 6px;
     }
 
-    .chart-sub-label {
+    .chart-header .title-area span {
       font-size: 10px;
       color: #64748b;
-      margin-top: 1px;
     }
 
-    /* Top-right compact live value display */
-    .chart-live-stat {
+    .chart-header .val-area {
       text-align: right;
     }
 
-    .stat-number {
+    .chart-header .val-area .numeric-val {
       font-size: 26px;
       font-weight: 700;
       color: #ffffff;
       line-height: 1;
-      font-family: 'Poppins', sans-serif !important;
-      letter-spacing: -0.5px;
+      font-variant-numeric: tabular-nums;
     }
 
-    .stat-unit {
-      font-size: 11px;
-      font-weight: 500;
+    .chart-header .val-area .unit-label {
+      font-size: 10px;
       color: #94a3b8;
-      margin-left: 2px;
+      text-transform: uppercase;
     }
 
     .chart-container {
       position: relative;
-      height: 155px;
+      height: 160px;
       width: 100%;
     }
 
-    /* Suit Actuators & Countermeasures Panel (Interactive from site!) */
-    .actuators-section {
-      background: linear-gradient(180deg, #0b101e 0%, #080c17 100%);
+    /* Suit Actuators Panel */
+    .actuators-card {
+      background-color: #0c1222;
       border: 1px solid #1e293b;
       border-radius: 8px;
       padding: 16px 20px;
-      margin-bottom: 16px;
+      margin-bottom: 20px;
     }
 
-    .actuators-header {
+    .actuators-card h3 {
+      font-size: 13px;
+      font-weight: 600;
+      color: #38bdf8;
+      margin-bottom: 12px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 12px;
-    }
-
-    .actuators-header h3 {
-      font-size: 13px;
-      font-weight: 700;
-      color: #38bdf8;
-      letter-spacing: 0.5px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .actuator-status-toast {
-      font-size: 11px;
-      color: #94a3b8;
-    }
-
-    .actuator-status-toast.active-cmd {
-      color: #34d399;
-      font-weight: 600;
-    }
-
-    .actuator-status-toast.err-cmd {
-      color: #f87171;
-      font-weight: 600;
     }
 
     .actuator-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
+      gap: 12px;
     }
 
-    @media (max-width: 1024px) {
+    @media (max-width: 900px) {
       .actuator-grid { grid-template-columns: repeat(2, 1fr); }
     }
 
-    @media (max-width: 600px) {
-      .actuator-grid { grid-template-columns: 1fr; }
-    }
-
-    .actuator-card {
+    .btn-actuator {
       background-color: #060913;
       border: 1px solid #1e293b;
       border-radius: 6px;
-      padding: 12px;
+      padding: 10px 14px;
+      color: #cbd5e1;
+      cursor: pointer;
+      text-align: left;
+      font-size: 12px;
+      font-weight: 500;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
-      gap: 8px;
-      transition: all 0.2s ease;
+      gap: 4px;
+      transition: all 0.2s;
     }
 
-    .actuator-card h4 {
-      font-size: 11px;
-      font-weight: 600;
-      color: #cbd5e1;
+    .btn-actuator:hover {
+      background-color: #1e293b;
+      border-color: #334155;
     }
 
-    .actuator-card p {
+    .btn-actuator span.status {
       font-size: 10px;
       color: #64748b;
-      line-height: 1.4;
     }
 
-    .actuator-btn {
-      padding: 8px 10px;
-      border-radius: 5px;
-      font-size: 11px;
-      font-weight: 600;
-      cursor: pointer;
-      border: 1px solid #334155;
-      background-color: #111a2f;
-      color: #94a3b8;
-      transition: all 0.2s;
-      text-align: center;
-    }
-
-    .actuator-btn:hover {
-      background-color: #1e293b;
-      color: #ffffff;
-    }
-
-    /* Glowing Urgent Directive on specific button when anomaly strikes */
-    .actuator-card.urgent-target {
+    .btn-actuator.active-action {
       border-color: #ef4444;
-      background-color: #240d12;
-      box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
+      background-color: #2b1115;
+      color: #fecaca;
+      animation: actuatorPulse 1s infinite alternate;
     }
 
-    .actuator-card.urgent-target .actuator-btn {
-      background: linear-gradient(90deg, #b91c1c, #dc2626);
-      color: #ffffff;
-      border-color: #f87171;
-      animation: actuatorBlink 0.9s infinite alternate;
-      font-weight: 700;
-    }
-
-    @keyframes actuatorBlink {
-      from { box-shadow: 0 0 4px #dc2626; }
-      to { box-shadow: 0 0 14px #f87171; }
+    @keyframes actuatorPulse {
+      from { box-shadow: 0 0 4px rgba(220, 38, 38, 0.3); border-color: #dc2626; }
+      to { box-shadow: 0 0 14px rgba(239, 68, 68, 0.6); border-color: #f87171; }
     }
 
     /* Decision Area */
     .decision-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 12px;
+      gap: 16px;
     }
 
     @media (max-width: 768px) {
@@ -474,25 +436,25 @@
     }
 
     .decision-card {
-      background-color: #0a0e1a;
-      border: 1px solid #1a2333;
+      background-color: #0c1222;
+      border: 1px solid #1e293b;
       border-radius: 8px;
-      padding: 16px 18px;
+      padding: 16px 20px;
     }
 
     .decision-card h3 {
       font-size: 13px;
       font-weight: 600;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
       color: #38bdf8;
     }
 
     .action-directive-box {
-      padding: 12px 14px;
+      padding: 14px;
       border-radius: 6px;
       background-color: #060913;
       border-left: 4px solid #334155;
-      font-size: 11px;
+      font-size: 12px;
       line-height: 1.5;
       color: #94a3b8;
     }
@@ -509,21 +471,21 @@
       to { border-left-color: #f87171; box-shadow: 0 0 12px rgba(239,68,68,0.5); }
     }
 
-    /* Local Storage Drawer (Clean Offset below Banner) */
+    /* Mission BlackBox Log Drawer */
     #storageDrawer {
       position: fixed;
-      top: 44px;
+      top: 48px;
       right: -420px;
       width: 400px;
-      height: calc(100vh - 44px);
-      background-color: #0a0e1a;
+      height: calc(100vh - 48px);
+      background-color: #0c1222;
       border-left: 1px solid #1e293b;
-      z-index: 900;
+      z-index: 500;
       padding: 20px;
       display: flex;
       flex-direction: column;
       transition: right 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: -10px 0 30px rgba(0,0,0,0.7);
+      box-shadow: -10px 0 30px rgba(0,0,0,0.6);
     }
 
     #storageDrawer.open {
@@ -545,7 +507,7 @@
       border: none;
       padding: 5px 12px;
       border-radius: 5px;
-      font-size: 11px;
+      font-size: 12px;
       font-weight: 600;
       cursor: pointer;
     }
@@ -556,40 +518,43 @@
       flex: 1;
       overflow-y: auto;
       font-size: 11px;
-      background-color: #040711;
-      border: 1px solid #1a2333;
+      background-color: #060913;
+      border: 1px solid #1e293b;
       border-radius: 6px;
       padding: 10px;
       color: #38bdf8;
-      font-family: 'Poppins', sans-serif !important;
+      font-family: monospace;
       white-space: pre-wrap;
     }
 
     #drawerBackdrop {
       display: none;
       position: fixed;
-      top: 44px;
+      top: 0;
       left: 0;
       width: 100%;
-      height: calc(100vh - 44px);
-      background: rgba(0,0,0,0.5);
-      z-index: 850;
+      height: 100%;
+      background: rgba(0,0,0,0.4);
+      z-index: 450;
     }
 
-    #drawerBackdrop.show { display: block; }
+    #drawerBackdrop.show {
+      display: block;
+    }
 
-    /* Footer */
     footer {
-      background-color: #040711;
-      border-top: 1px solid #1a2333;
-      padding: 14px 28px;
+      background-color: #060913;
+      border-top: 1px solid #1e293b;
+      padding: 14px 32px;
       text-align: center;
       font-size: 11px;
       color: #64748b;
       margin-top: 20px;
     }
 
-    footer strong { color: #94a3b8; }
+    footer strong {
+      color: #94a3b8;
+    }
   </style>
 </head>
 <body>
@@ -602,19 +567,19 @@
   <!-- Header -->
   <header>
     <div class="title-group">
-      <div class="sub-tag">Astronaut Forearm Wearable Cybernetic Interface</div>
-      <h1>EVA Suit Cuff HUD & Telemetry Control</h1>
-      <p>NASA Spaceflight Human-System Standards (<strong>NASA-STD-3001</strong>) Compliant System</p>
+      <div class="sub-tag">Astraea Autonomous Health Officer</div>
+      <h1>Crew Health & Cabin Monitoring</h1>
+      <p>Deep-space telemetry cross-correlation compliant with <strong>NASA-STD-3001</strong> aerospace limits.</p>
     </div>
 
     <div class="header-actions">
-      <!-- Direct Hardware Web Serial Button -->
-      <button class="btn btn-hardware" id="btnHardwareSerial" onclick="toggleWebSerial()">
-        <span class="mono">🔌</span>
-        <span id="hardwareBtnText">Connect Suit ESP32</span>
+      <!-- 2-Stage Hardware Bus Switch -->
+      <button class="btn btn-bus" id="btnWiredBus" onclick="toggleWiredBus()">
+        <span class="status-dot"></span>
+        <span id="wiredBusLabel">Wired Sensor Bus: OFF</span>
       </button>
 
-      <!-- Simulator Presets Dropdown -->
+      <!-- Simulators & Anomaly Injectors -->
       <div class="dropdown" id="simDropdown">
         <button class="btn btn-primary" onclick="toggleDropdown(event)">
           📡 Telemetry Simulator ▾
@@ -622,29 +587,29 @@
         <div class="dropdown-content">
           <button onclick="setScenario('nominal')">
             <span>1. Nominal Baseline</span>
-            <span class="subtitle">Stable vitals within standard limits</span>
+            <span class="subtitle">Standard Crew Telemetry</span>
           </button>
           <button onclick="setScenario('hypercapnia')">
-            <span>2. ppCO2 Scrub Failure</span>
-            <span class="subtitle">ppCO2 > 3.8 mmHg, Cardiac Strain</span>
+            <span>2. CO2 Scrub Failure</span>
+            <span class="subtitle">ppCO2 > 3.8 mmHg, HR High</span>
           </button>
           <button onclick="setScenario('decompression')">
-            <span>3. Suit Micro-Decompression</span>
+            <span>3. Micro-Decompression</span>
             <span class="subtitle">Pressure < 90 kPa, SpO2 Drop</span>
           </button>
           <button onclick="setScenario('eva')">
             <span>4. Heavy EVA Exertion</span>
-            <span class="subtitle">Pulse > 130 BPM, Heat Load</span>
+            <span class="subtitle">Elevated Vitals, Safe Pressure</span>
           </button>
           <button onclick="clearTelemetry()" style="color: #ef4444;">
-            <span>✖ Reset / Disconnect</span>
-            <span class="subtitle">Set to standby (-- values)</span>
+            <span>✖ Disconnect Telemetry</span>
+            <span class="subtitle">Reset to standby (-- values)</span>
           </button>
         </div>
       </div>
 
       <button class="btn btn-secondary" onclick="openStorageDrawer()">
-        💾 Local Storage
+        💾 Mission BlackBox Log
       </button>
     </div>
   </header>
@@ -653,37 +618,29 @@
   <main>
     <!-- Crew Identity Ribbon -->
     <div class="crew-ribbon">
-      <div class="crew-info">
-        <div>
-          <span class="crew-tag">Astronaut: </span>
-          <input type="text" id="crewNameInput" class="crew-name-input" value="CDR. Alex Vance" title="Click to edit astronaut name" onchange="updateCrewName()">
-        </div>
-        <div>
-          <span class="crew-tag">Callsign: </span>
-          <span style="font-weight: 600; font-size: 12px; color: #cbd5e1;">VICTORIOUS-1</span>
-        </div>
-        <div>
-          <span class="crew-tag">Suit Unit: </span>
-          <span class="mono" style="font-size: 11px; color: #38bdf8;">EMU-SER-4089</span>
-        </div>
+      <div class="crew-identity">
+        <span class="label">Astronaut Call:</span>
+        <input type="text" id="crewNameInput" value="CDR. Alex Vance" onchange="updateCrewName()" placeholder="Enter Astronaut Name">
       </div>
-      <div class="cuff-badge">
-        <span>WRIST HUD MOUNT: ACTIVE</span>
+      <div class="crew-metadata">
+        <div>Callsign: <strong>ORION-1</strong></div>
+        <div>Suit Unit: <strong>SER-4089</strong></div>
+        <div>Mount: <strong>WRIST HUD</strong></div>
       </div>
     </div>
 
-    <!-- Strict 2x2 Matrix Graph Layout with Embedded Top-Right Values -->
+    <!-- 2x2 Matrix Grid with Integrated Values -->
     <div class="charts-matrix">
       <!-- (1,1) Heart Rate -->
       <div class="chart-box" id="cardHR">
         <div class="chart-header">
-          <div class="chart-title-area">
+          <div class="title-area">
             <h3>Crew Heart Rate</h3>
-            <div class="chart-sub-label">NASA-STD-3001 Limit: 60 - 100 BPM</div>
+            <span>NASA-STD-3001 Baseline: 60 - 100 BPM</span>
           </div>
-          <div class="chart-live-stat">
-            <span class="stat-number" id="valHR">--</span>
-            <span class="stat-unit">BPM</span>
+          <div class="val-area">
+            <div class="numeric-val" id="valHR">--</div>
+            <div class="unit-label">BPM</div>
           </div>
         </div>
         <div class="chart-container">
@@ -694,13 +651,13 @@
       <!-- (1,2) SpO2 -->
       <div class="chart-box" id="cardSpO2">
         <div class="chart-header">
-          <div class="chart-title-area">
+          <div class="title-area">
             <h3>Blood Oxygen Saturation</h3>
-            <div class="chart-sub-label">Nominal Baseline: 95% - 100%</div>
+            <span>Nominal Baseline: 95% - 100%</span>
           </div>
-          <div class="chart-live-stat">
-            <span class="stat-number" id="valSpO2">--</span>
-            <span class="stat-unit">SpO₂</span>
+          <div class="val-area">
+            <div class="numeric-val" id="valSpO2">--</div>
+            <div class="unit-label">SpO₂</div>
           </div>
         </div>
         <div class="chart-container">
@@ -708,16 +665,16 @@
         </div>
       </div>
 
-      <!-- (2,1) Suit Pressure -->
+      <!-- (2,1) Cabin Pressure -->
       <div class="chart-box" id="cardPressure">
         <div class="chart-header">
-          <div class="chart-title-area">
+          <div class="title-area">
             <h3>Suit Internal Pressure</h3>
-            <div class="chart-sub-label">Nominal Envelope: 97 - 103 kPa</div>
+            <span>Nominal Envelope: 97 - 103 kPa</span>
           </div>
-          <div class="chart-live-stat">
-            <span class="stat-number" id="valPressure">--</span>
-            <span class="stat-unit">kPa</span>
+          <div class="val-area">
+            <div class="numeric-val" id="valPressure">--</div>
+            <div class="unit-label">kPa</div>
           </div>
         </div>
         <div class="chart-container">
@@ -725,16 +682,16 @@
         </div>
       </div>
 
-      <!-- (2,2) ppCO2 -->
+      <!-- (2,2) Cabin CO2 -->
       <div class="chart-box" id="cardCO2">
         <div class="chart-header">
-          <div class="chart-title-area">
+          <div class="title-area">
             <h3>Partial Pressure CO₂</h3>
-            <div class="chart-sub-label">NASA Maximum: &le; 3.0 mmHg</div>
+            <span>NASA Maximum: &le; 3.0 mmHg</span>
           </div>
-          <div class="chart-live-stat">
-            <span class="stat-number" id="valCO2">--</span>
-            <span class="stat-unit">mmHg</span>
+          <div class="val-area">
+            <div class="numeric-val" id="valCO2">--</div>
+            <div class="unit-label">mmHg</div>
           </div>
         </div>
         <div class="chart-container">
@@ -743,60 +700,36 @@
       </div>
     </div>
 
-    <!-- Interactive Suit Actuators Panel (Can be triggered directly from the HUD!) -->
-    <div class="actuators-section">
-      <div class="actuators-header">
-        <h3>⚡ SUIT LIFE-SUPPORT ACTUATORS & COUNTERMEASURES (HUD CONTROL)</h3>
-        <span class="actuator-status-toast" id="actuatorToast">Awaiting telemetry trigger...</span>
-      </div>
+    <!-- Suit Actuators Panel -->
+    <div class="actuators-card">
+      <h3>
+        <span>Spacesuit Life-Support Actuators (Hardware Telecommand)</span>
+        <span style="font-size: 11px; color: #64748b;">Direct Telecommand Bus</span>
+      </h3>
       <div class="actuator-grid">
-        <!-- Actuator 1: LiOH Scrubber -->
-        <div class="actuator-card" id="actCardScrubber">
-          <div>
-            <h4>Secondary LiOH Scrubber</h4>
-            <p>Overrides ECLSS loop to clear toxic carbon dioxide accumulation.</p>
-          </div>
-          <button class="actuator-btn" id="btnActScrubber" onclick="executeActuator('SCRUBBER', 'Secondary LiOH Scrubber Loop Overridden')">
-            Engage Scrubber
-          </button>
-        </div>
+        <button class="btn-actuator" id="actScrubber" onclick="executeActuator('scrubber')">
+          <span style="font-weight: 600;">LiOH Scrubber Loop 2</span>
+          <span class="status" id="statusScrubber">Status: STANDBY (LOOP 1 ACTIVE)</span>
+        </button>
 
-        <!-- Actuator 2: Pressure Seal -->
-        <div class="actuator-card" id="actCardPressure">
-          <div>
-            <h4>IVA Seal & O₂ Purge</h4>
-            <p>Seals suit pressure valves and initiates positive oxygen flow.</p>
-          </div>
-          <button class="actuator-btn" id="btnActPressure" onclick="executeActuator('PRESSURE_SEAL', 'Suit Seal & 100% O2 Purge Activated')">
-            Deploy Suit Seal
-          </button>
-        </div>
+        <button class="btn-actuator" id="actSeal" onclick="executeActuator('seal')">
+          <span style="font-weight: 600;">Deploy Suit Seal / O2 Purge</span>
+          <span class="status" id="statusSeal">Status: UNSEALED (ATMOSPHERIC)</span>
+        </button>
 
-        <!-- Actuator 3: Liquid Cooling Garment (LCG) -->
-        <div class="actuator-card" id="actCardCooling">
-          <div>
-            <h4>Liquid Cooling Garment (LCG)</h4>
-            <p>Boosts coolant flow rate to dissipate extreme metabolic EVA heat.</p>
-          </div>
-          <button class="actuator-btn" id="btnActCooling" onclick="executeActuator('COOLING_BOOST', 'Liquid Cooling Flow Increased to Max')">
-            Boost Cooling Loop
-          </button>
-        </div>
+        <button class="btn-actuator" id="actCooling" onclick="executeActuator('cooling')">
+          <span style="font-weight: 600;">Liquid Cooling Garment (LCG)</span>
+          <span class="status" id="statusCooling">Status: NOMINAL CIRCULATION</span>
+        </button>
 
-        <!-- Actuator 4: Automated Medical Injection -->
-        <div class="actuator-card" id="actCardMed">
-          <div>
-            <h4>Anti-Hypoxia Drug Auto-Injector</h4>
-            <p>Intra-suit pharmacological countermeasure for critical vital drop.</p>
-          </div>
-          <button class="actuator-btn" id="btnActMed" onclick="executeActuator('MED_INJECT', 'Emergency Drug Dose Administered')">
-            Authorize Injector
-          </button>
-        </div>
+        <button class="btn-actuator" id="actMed" onclick="executeActuator('med')">
+          <span style="font-weight: 600;">Auto-Medication Injector</span>
+          <span class="status" id="statusMed">Status: ARMED (REQUIRES DIRECTIVE)</span>
+        </button>
       </div>
     </div>
 
-    <!-- Clinical Decision & Action Required -->
+    <!-- Decision Area -->
     <div class="decision-grid">
       <div class="decision-card">
         <h3>Autonomous Clinical Evaluation</h3>
@@ -806,19 +739,19 @@
             Awaiting Telemetry Feed
           </div>
         </div>
-        <p id="diagDetails" style="font-size: 11px; color: #94a3b8; line-height: 1.5;">
-          Connect suit hardware or select a simulator scenario to initiate clinical cross-correlation.
+        <p id="diagDetails" style="font-size: 12px; color: #94a3b8; line-height: 1.5;">
+          Connect wired sensor bus or select a simulator scenario to initiate clinical cross-correlation.
         </p>
       </div>
 
       <div class="decision-card">
         <h3>Immediate Action Directive</h3>
         <div class="action-directive-box" id="actionDirectiveBox">
-          <strong id="actionHeading" style="display: block; font-size: 12px; color: #cbd5e1; margin-bottom: 2px;">
+          <strong id="actionHeading" style="display: block; font-size: 13px; color: #cbd5e1; margin-bottom: 2px;">
             Standby State
           </strong>
           <span id="actionDescription">
-            No emergency detected. Wrist HUD waiting for telemetry feed.
+            No emergency detected. Awaiting telemetry stream.
           </span>
         </div>
       </div>
@@ -829,32 +762,35 @@
   <div id="drawerBackdrop" onclick="closeStorageDrawer()"></div>
   <div id="storageDrawer">
     <div class="drawer-header">
-      <h3 style="font-size: 13px; font-weight: 600; color: #ffffff;">Saved LocalStorage Logs</h3>
-      <button class="close-log-btn" onclick="closeStorageDrawer()">✕ Close Drawer</button>
+      <h3 style="font-size: 13px; font-weight: 600; color: #ffffff;">Mission BlackBox Log</h3>
+      <button class="close-log-btn" onclick="closeStorageDrawer()">✕ Close Log</button>
     </div>
     <div class="drawer-content" id="storageLogDisplay">Loading logs...</div>
     <div style="margin-top: 12px; display: flex; gap: 8px;">
       <button class="btn btn-secondary" style="flex: 1; font-size: 11px;" onclick="clearStoredLogs()">Clear Logs</button>
-      <button class="btn btn-primary" style="flex: 1; font-size: 11px;" onclick="exportStoredLogs()">Export JSON</button>
+      <button class="btn btn-primary" style="flex: 1; font-size: 11px;" onclick="exportStoredLogs()">Export Flight JSON</button>
     </div>
   </div>
 
   <!-- Footer -->
   <footer>
-    Developed by <strong>Team Victorious</strong> | NASA Space Apps Challenge 2026 | NASA-STD-3001 Compliant Wearable Architecture
+    Developed by <strong>Team Victorious</strong> | NASA Space Apps Challenge 2026
   </footer>
 
   <script>
     // --- 1. Global State ---
     let telemetryInterval = null;
     let phase = 0;
+    let isWiredConnected = false;
+    let isDataStreaming = false;
     let activeCrewName = localStorage.getItem('astraea_crew_name') || 'CDR. Alex Vance';
     let logCache = JSON.parse(localStorage.getItem('astraea_logs') || '[]');
-    let serialPort = null;
-    let serialReader = null;
-    let serialWriter = null;
 
-    // Initialize Crew Name Input
+    let chartHR = null;
+    let chartSpO2 = null;
+    let chartPressure = null;
+    let chartCO2 = null;
+
     document.getElementById('crewNameInput').value = activeCrewName;
 
     function updateCrewName() {
@@ -863,54 +799,71 @@
       localStorage.setItem('astraea_crew_name', activeCrewName);
     }
 
-    // --- 2. Chart Configurations (Fluid Smooth Monotone Waves) ---
-    function createSmoothChart(canvasId, color, yMin, yMax) {
-      const ctx = document.getElementById(canvasId).getContext('2d');
-      const gradient = ctx.createLinearGradient(0, 0, 0, 150);
-      gradient.addColorStop(0, color + '33');
-      gradient.addColorStop(1, color + '00');
-
-      return new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: [],
-          datasets: [{
-            data: [],
-            borderColor: color,
-            borderWidth: 2,
-            backgroundColor: gradient,
-            fill: true,
-            tension: 0.45,
-            cubicInterpolationMode: 'monotone',
-            pointRadius: 0,
-            pointHoverRadius: 4
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          animation: false,
-          scales: {
-            x: { display: false },
-            y: {
-              min: yMin,
-              max: yMax,
-              grid: { color: '#131b2e', drawBorder: false },
-              ticks: { color: '#64748b', font: { size: 10, family: 'Poppins' } }
-            }
-          },
-          plugins: {
-            legend: { display: false },
-            tooltip: { enabled: true }
-          }
-        }
-      });
+    // --- 2. Chart Initializer with Multi-CDN Fallback ---
+    function initCharts() {
+      if (typeof Chart === 'undefined') {
+        const fallbackScript = document.createElement('script');
+        fallbackScript.src = "https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js";
+        fallbackScript.onload = () => buildCharts();
+        document.head.appendChild(fallbackScript);
+      } else {
+        buildCharts();
+      }
     }
 
-    const chartHR = createSmoothChart('chartHR', '#ec4899', 40, 180);
-    const chartSpO2 = createSmoothChart('chartSpO2', '#38bdf8', 75, 102);
-    const chartPressure = createSmoothChart('chartPressure', '#eab308', 60, 120);
-    const chartCO2 = createSmoothChart('chartCO2', '#a855f7', 0, 7);
+    function buildCharts() {
+      function createSmoothChart(canvasId, color, yMin, yMax) {
+        const canvas = document.getElementById(canvasId);
+        if (!canvas) return null;
+        const ctx = canvas.getContext('2d');
+        const gradient = ctx.createLinearGradient(0, 0, 0, 160);
+        gradient.addColorStop(0, color + '33');
+        gradient.addColorStop(1, color + '00');
+
+        return new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: [],
+            datasets: [{
+              data: [],
+              borderColor: color,
+              borderWidth: 2.2,
+              backgroundColor: gradient,
+              fill: true,
+              tension: 0.45,
+              cubicInterpolationMode: 'monotone',
+              pointRadius: 0,
+              pointHoverRadius: 4
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: false,
+            scales: {
+              x: { display: false },
+              y: {
+                min: yMin,
+                max: yMax,
+                grid: { color: '#131b2e', drawBorder: false },
+                ticks: { color: '#64748b', font: { size: 10, family: 'Poppins' } }
+              }
+            },
+            plugins: {
+              legend: { display: false },
+              tooltip: { enabled: true }
+            }
+          }
+        });
+      }
+
+      chartHR = createSmoothChart('chartHR', '#ec4899', 40, 180);
+      chartSpO2 = createSmoothChart('chartSpO2', '#38bdf8', 75, 102);
+      chartPressure = createSmoothChart('chartPressure', '#eab308', 60, 120);
+      chartCO2 = createSmoothChart('chartCO2', '#a855f7', 0, 7);
+    }
+
+    window.addEventListener('load', initCharts);
 
     // --- 3. Telemetry Streamer & Processing ---
     function updateSystem(vitals) {
@@ -920,12 +873,15 @@
       document.getElementById('valCO2').innerText = vitals.co2;
 
       const now = '';
-      [
+      const chartItems = [
         { chart: chartHR, val: vitals.hr },
         { chart: chartSpO2, val: vitals.spo2 },
         { chart: chartPressure, val: vitals.pressure },
         { chart: chartCO2, val: vitals.co2 }
-      ].forEach(item => {
+      ];
+
+      chartItems.forEach(item => {
+        if (!item.chart) return;
         if (item.chart.data.labels.length > 25) {
           item.chart.data.labels.shift();
           item.chart.data.datasets[0].data.shift();
@@ -938,6 +894,8 @@
       evaluateClinicalState(vitals);
       saveLog(vitals);
     }
+
+    // --- 4. NASA Clinical Rules & Anomaly Alerting ---
     function evaluateClinicalState(v) {
       const topBanner = document.getElementById('emergencyTopBanner');
       const actionBox = document.getElementById('actionDirectiveBox');
@@ -945,214 +903,182 @@
       const diagDetails = document.getElementById('diagDetails');
       const actionHead = document.getElementById('actionHeading');
       const actionDesc = document.getElementById('actionDescription');
+
+      // Reset indicators
       topBanner.style.display = 'none';
       actionBox.classList.remove('action-blink');
       document.querySelectorAll('.chart-box').forEach(c => c.classList.remove('alert-border'));
-      document.querySelectorAll('.actuator-card').forEach(c => c.classList.remove('urgent-target'));
+      document.querySelectorAll('.btn-actuator').forEach(b => b.classList.remove('active-action'));
+
+      // 1. Hypercapnia Risk
       if (v.co2 >= 3.5) {
         document.getElementById('cardCO2').classList.add('alert-border');
         document.getElementById('cardHR').classList.add('alert-border');
+        
         topBanner.style.display = 'block';
         document.getElementById('bannerDiagnosisText').innerText = `ACUTE HYPERCAPNIA (${v.co2} mmHg)`;
-        document.getElementById('bannerActionText').innerText = 'ENGAGE SECONDARY SCRUBBER FROM CUFF';
+        document.getElementById('bannerActionText').innerText = 'MANUAL OVERRIDE SCRUBBER LOOP 2';
+
         diagTitle.innerText = 'Toxic Hypercapnia Risk (NASA-STD-3001)';
-        diagDetails.innerText = 'ppCO2 levels breach aerospace limits (3.0 mmHg). Cardiac stress reflex detected.';
-        actionHead.innerText = 'URGENT: OVERRIDE LiOH SCRUBBERS';
-        actionDesc.innerText = 'Trigger the blinking "Secondary LiOH Scrubber" actuator on your arm cuff immediately!';
+        diagDetails.innerText = 'ppCO2 levels breach maximum allowable threshold (3.0 mmHg). Immediate carbon scrub required.';
+        
+        actionHead.innerText = 'URGENT: OVERRIDE ECLSS SCRUBBERS';
+        actionDesc.innerText = 'Trigger LiOH Scrubber Loop 2 from the Suit Actuator panel below to purge cabin CO2.';
         actionBox.classList.add('action-blink');
-        const target = document.getElementById('actCardScrubber');
-        target.classList.add('urgent-target');
-        document.getElementById('btnActScrubber').innerText = '⚠ [EXECUTE SCRUBBER]';
+
+        const actBtn = document.getElementById('actScrubber');
+        actBtn.classList.add('active-action');
+        document.getElementById('statusScrubber').innerText = '⚠ [DIRECTIVE: CLICK TO OVERRIDE]';
+        playBeepAudio(880, 0.15);
         return;
       }
+
+      // 2. Micro-Decompression Risk
       if (v.pressure < 92.0 || v.spo2 < 93) {
         document.getElementById('cardPressure').classList.add('alert-border');
         document.getElementById('cardSpO2').classList.add('alert-border');
+
         topBanner.style.display = 'block';
-        document.getElementById('bannerDiagnosisText').innerText = 'SUIT DECOMPRESSION DETECTED';
-        document.getElementById('bannerActionText').innerText = 'DEPLOY SUIT PRESSURE SEAL & O2 PURGE';
+        document.getElementById('bannerDiagnosisText').innerText = `CABIN DEPRESSURIZATION (${v.pressure} kPa)`;
+        document.getElementById('bannerActionText').innerText = 'SEAL SUIT / O2 PURGE';
+
         diagTitle.innerText = 'Hypobaric Decompression Alert';
-        diagDetails.innerText = 'Suit pressure dropped below safe threshold (97.0 kPa). Early arterial hypoxia risk.';
-        actionHead.innerText = 'CRITICAL: SEAL COMPARTMENT & PURGE';
-        actionDesc.innerText = 'Press the blinking "IVA Seal & O2 Purge" actuator on your cuff to arrest pressure drop.';
+        diagDetails.innerText = 'Suit pressure has dropped below nominal threshold (97.0 kPa). Early arterial hypoxia detected.';
+
+        actionHead.innerText = 'CRITICAL: SEAL SPACESUIT';
+        actionDesc.innerText = 'Deploy suit seal actuators immediately to repressurize helmet and maintain arterial saturation.';
         actionBox.classList.add('action-blink');
-        const target = document.getElementById('actCardPressure');
-        target.classList.add('urgent-target');
-        document.getElementById('btnActPressure').innerText = '⚠ [DEPLOY SEAL]';
+
+        const actBtn = document.getElementById('actSeal');
+        actBtn.classList.add('active-action');
+        document.getElementById('statusSeal').innerText = '⚠ [DIRECTIVE: CLICK TO SEAL]';
+        playBeepAudio(1046, 0.2);
         return;
       }
+
+      // 3. High Exertion
       if (v.hr > 125) {
         document.getElementById('cardHR').classList.add('alert-border');
-        diagTitle.innerText = 'Elevated Metabolic Exertion (EVA Strain)';
-        diagDetails.innerText = 'High pulse under nominal pressure. Thermal regulation load increasing.';
-        actionHead.innerText = 'ADVISORY: BOOST LIQUID COOLING (LCG)';
-        actionDesc.innerText = 'Press the "Liquid Cooling Garment" actuator button to dissipate metabolic core heat.';
-        const target = document.getElementById('actCardCooling');
-        target.classList.add('urgent-target');
-        document.getElementById('btnActCooling').innerText = '⚠ [BOOST COOLING]';
+
+        diagTitle.innerText = 'High Metabolic Exertion (EVA Strain)';
+        diagDetails.innerText = 'Elevated cardiac exertion noted. Suit internal pressure and gas balance remain safe.';
+
+        actionHead.innerText = 'ADVISORY: BOOST COOLING GARMENT';
+        actionDesc.innerText = 'Engage maximum LCG flow rate to disperse core heat and prevent thermal exhaustion.';
+
+        const actBtn = document.getElementById('actCooling');
+        actBtn.classList.add('active-action');
+        document.getElementById('statusCooling').innerText = '⚠ [ADVISORY: CLICK TO BOOST]';
         return;
       }
+
+      // Nominal Status
       diagTitle.innerText = 'Nominal Flight Status';
-      diagDetails.innerText = 'All physiological and atmospheric variables reside within established NASA-STD-3001 limits.';
+      diagDetails.innerText = 'All biometrics and cabin atmospheric metrics reside within NASA-STD-3001 safety envelopes.';
       actionHead.innerText = 'Routine Operations';
-      actionDesc.innerText = 'No intervention required. Suit life-support loops operating autonomously.';
-      document.getElementById('btnActScrubber').innerText = 'Engage Scrubber';
-      document.getElementById('btnActPressure').innerText = 'Deploy Suit Seal';
-      document.getElementById('btnActCooling').innerText = 'Boost Cooling Loop';
-      document.getElementById('btnActMed').innerText = 'Authorize Injector';
-    }
-    async function executeActuator(type, message) {
-      playBeepAudio();
-      const toast = document.getElementById('actuatorToast');
-      toast.innerText = `COMMAND SENT: ${message} (Transmitted to Suit Relay)`;
-      toast.classList.add('active-cmd');
-      if (serialWriter) {
-        try {
-          const encoder = new TextEncoder();
-          await serialWriter.write(encoder.encode(`CMD:${type}\n`));
-          console.log(`Command transmitted to ESP32: CMD:${type}`);
-        } catch (e) {
-          console.error('Serial Write Error:', e);
-        }
-      }
-      logCache.unshift({
-        timestamp: new Date().toLocaleTimeString(),
-        crew_name: activeCrewName,
-        actuator_executed: type,
-        status: message
-      });
-      localStorage.setItem('astraea_logs', JSON.stringify(logCache));
-      setTimeout(() => {
-        toast.innerText = `STATUS: Countermeasure active. Normalizing telemetry.`;
-        setScenario('nominal');
-      }, 1800);
+      actionDesc.innerText = 'No intervention required. Spacesuit life-support loops functioning nominally.';
+      document.getElementById('statusScrubber').innerText = 'Status: STANDBY (LOOP 1 ACTIVE)';
+      document.getElementById('statusSeal').innerText = 'Status: UNSEALED (ATMOSPHERIC)';
+      document.getElementById('statusCooling').innerText = 'Status: NOMINAL CIRCULATION';
+      document.getElementById('statusMed').innerText = 'Status: ARMED (REQUIRES DIRECTIVE)';
     }
 
-    function playBeepAudio() {
+    // --- 5. Suit Actuators Execution ---
+    function executeActuator(type) {
+      playBeepAudio(1200, 0.08);
+
+      if (type === 'scrubber') {
+        document.getElementById('statusScrubber').innerText = 'ENGAGED - LOOP 2 ACTIVE (PURGING CO2)';
+        document.getElementById('actScrubber').classList.remove('active-action');
+        setTimeout(() => {
+          if (telemetryInterval) setScenario('nominal');
+        }, 1200);
+      } else if (type === 'seal') {
+        document.getElementById('statusSeal').innerText = 'SEALED - 100% O2 PURGE ENGAGED';
+        document.getElementById('actSeal').classList.remove('active-action');
+        setTimeout(() => {
+          if (telemetryInterval) setScenario('nominal');
+        }, 1200);
+      } else if (type === 'cooling') {
+        document.getElementById('statusCooling').innerText = 'BOOSTED - 100% CHILL FLOW ACTIVE';
+        document.getElementById('actCooling').classList.remove('active-action');
+      } else if (type === 'med') {
+        document.getElementById('statusMed').innerText = 'INJECTED - ATROPINE/SALINE DOSE COMPLETE';
+        document.getElementById('actMed').classList.remove('active-action');
+      }
+    }
+
+    // Audio synthesizer for alarms
+    function playBeepAudio(freq, duration) {
       try {
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(880, audioCtx.currentTime); // 880Hz A5 note
-        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
         osc.connect(gain);
         gain.connect(audioCtx.destination);
         osc.start();
-        osc.stop(audioCtx.currentTime + 0.15);
-      } catch (e) {}
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) {
+        // AudioContext silent fallback
+      }
     }
-    async function toggleWebSerial() {
-      closeAllDropdowns();
-      const btn = document.getElementById('btnHardwareSerial');
-      const text = document.getElementById('hardwareBtnText');
-      const toast = document.getElementById('actuatorToast');
-      if (serialPort || isSerialEmulated) {
-        disconnectSerial();
-        return;
-      }
-      if (!('serial' in navigator)) {
-        fallbackToSimulatedHardware('Web Serial not supported in this browser. Running ESP32 Bio-Cuff emulation mode.');
-        return;
-      }
-      try {
-        serialPort = await navigator.serial.requestPort();
-        await serialPort.open({ baudRate: 115200 });
+
+    // --- 6. Realistic 2-Stage Hardware Bus Switch ---
+    function toggleWiredBus() {
+      const btn = document.getElementById('btnWiredBus');
+      const label = document.getElementById('wiredBusLabel');
+      closeDropdown();
+
+      if (isWiredConnected) {
+        // Disconnect
         clearInterval(telemetryInterval);
-        btn.classList.add('connected');
-        text.innerText = 'ESP32 Bio-Cuff Connected (USB)';
-        toast.innerText = 'STATUS: ESP32 hardware serial connection established.';
-        toast.className = 'actuator-status-toast active-cmd';
-        const textEncoder = new TextEncoderStream();
-        const writableStreamClosed = textEncoder.readable.pipeTo(serialPort.writable);
-        serialWriter = textEncoder.writable.getWriter();
-        const decoder = new TextDecoderStream();
-        const readableStreamClosed = serialPort.readable.pipeTo(decoder.writable);
-        serialReader = decoder.readable.getReader();
-        let lineBuffer = '';
-        while (true) {
-          const { value, done } = await serialReader.read();
-          if (done) break;
-          lineBuffer += value;
-          const lines = lineBuffer.split('\n');
-          lineBuffer = lines.pop();
-          for (const line of lines) {
-            const parts = line.trim().split(',');
-            if (parts.length === 4) {
-              const [hr, spo2, press, co2] = parts.map(Number);
-              if (!isNaN(hr) && !isNaN(spo2)) {
-                updateSystem({ hr, spo2, pressure: press, co2 });
-              }
-            }
-          }
-        }
-      } catch (err) {
-        // Intercept Permissions-Policy sandbox restrictions or user cancellation
-        console.warn('Web Serial Port Access notice:', err.message);
-        fallbackToSimulatedHardware('Sandbox iFrame restricted USB access. Running Live ESP32 Stream Simulation.');
+        isWiredConnected = false;
+        isDataStreaming = false;
+        btn.className = 'btn btn-bus';
+        label.innerText = 'Wired Sensor Bus: OFF';
+        clearTelemetry();
+      } else {
+        // Connected & listening (no data yet)
+        isWiredConnected = true;
+        isDataStreaming = false;
+        btn.className = 'btn btn-bus listening';
+        label.innerText = 'Wired Bus: LISTENING...';
+
+        document.getElementById('diagTitle').innerText = 'Sensor Bus Connected - Calibrating';
+        document.getElementById('diagDetails').innerText = 'Awaiting first telemetry data packet over physical suit wiring...';
+        document.getElementById('actionHeading').innerText = 'Waiting For Telemetry';
+        document.getElementById('actionDescription').innerText = 'No packet received yet. Select a condition from Telemetry Simulator to transmit packets.';
       }
     }
 
-    let isSerialEmulated = false;
-    function fallbackToSimulatedHardware(noticeMsg) {
-      clearInterval(telemetryInterval);
-      isSerialEmulated = true;
-      const btn = document.getElementById('btnHardwareSerial');
-      const text = document.getElementById('hardwareBtnText');
-      const toast = document.getElementById('actuatorToast');
-      btn.classList.add('connected');
-      text.innerText = 'ESP32 Bio-Cuff (Emulated)';
-      toast.innerText = `STATUS: ${noticeMsg}`;
-      toast.className = 'actuator-status-toast active-cmd';
-      let serialPhase = 0;
-      telemetryInterval = setInterval(() => {
-        serialPhase += 0.35;
-        updateSystem({
-          hr: Math.round(76 + Math.sin(serialPhase) * 4),
-          spo2: Math.min(100, Math.round(98 + Math.cos(serialPhase * 0.5) * 1)),
-          pressure: +(101.2 + Math.sin(serialPhase * 0.4) * 0.3).toFixed(1),
-          co2: +(1.25 + Math.cos(serialPhase * 0.6) * 0.1).toFixed(2)
-        });
-      }, 1000);
-    }
-
-    function disconnectSerial() {
-      isSerialEmulated = false;
-      if (serialReader) {
-        serialReader.cancel().catch(() => {});
-        serialReader = null;
-      }
-      if (serialWriter) {
-        serialWriter.close().catch(() => {});
-        serialWriter = null;
-      }
-      if (serialPort) {
-        serialPort.close().catch(() => {});
-        serialPort = null;
-      }
-      const btn = document.getElementById('btnHardwareSerial');
-      btn.classList.remove('connected');
-      document.getElementById('hardwareBtnText').innerText = 'Connect Suit ESP32';
-      const toast = document.getElementById('actuatorToast');
-      toast.innerText = 'STATUS: Suit hardware disconnected. System in standby.';
-      toast.className = 'actuator-status-toast';
-      clearTelemetry();
-    }
+    // --- 7. Simulator Scenarios ---
     function setScenario(type) {
-      closeAllDropdowns();
+      closeDropdown();
       clearInterval(telemetryInterval);
+
+      // Transition hardware button to streaming state
+      isWiredConnected = true;
+      isDataStreaming = true;
+      const btn = document.getElementById('btnWiredBus');
+      btn.className = 'btn btn-bus streaming';
+      document.getElementById('wiredBusLabel').innerText = 'Wired Bus: RECEIVING DATA';
+
       const presets = {
         nominal: { hr: 72, spo2: 98, pressure: 101.3, co2: 1.2, amp: 2 },
         hypercapnia: { hr: 114, spo2: 94, pressure: 100.8, co2: 4.2, amp: 4 },
         decompression: { hr: 122, spo2: 89, pressure: 84.5, co2: 1.1, amp: 3 },
         eva: { hr: 138, spo2: 97, pressure: 101.1, co2: 1.8, amp: 5 }
       };
+
       const base = presets[type];
+
       telemetryInterval = setInterval(() => {
         phase += 0.35;
         const wave = Math.sin(phase);
         const subwave = Math.cos(phase * 0.7);
+
         updateSystem({
           hr: Math.round(base.hr + wave * base.amp),
           spo2: Math.min(100, Math.round(base.spo2 + (wave * 0.5))),
@@ -1161,33 +1087,39 @@
         });
       }, 700);
     }
+
     function clearTelemetry() {
-      closeAllDropdowns();
+      closeDropdown();
       clearInterval(telemetryInterval);
+
       document.getElementById('valHR').innerText = '--';
       document.getElementById('valSpO2').innerText = '--';
       document.getElementById('valPressure').innerText = '--';
       document.getElementById('valCO2').innerText = '--';
+
       [chartHR, chartSpO2, chartPressure, chartCO2].forEach(c => {
+        if (!c) return;
         c.data.labels = [];
         c.data.datasets[0].data = [];
         c.update('none');
       });
+
       document.getElementById('emergencyTopBanner').style.display = 'none';
       document.getElementById('actionDirectiveBox').classList.remove('action-blink');
       document.querySelectorAll('.chart-box').forEach(c => c.classList.remove('alert-border'));
-      document.querySelectorAll('.actuator-card').forEach(c => c.classList.remove('urgent-target'));
+      document.querySelectorAll('.btn-actuator').forEach(b => b.classList.remove('active-action'));
+
       document.getElementById('diagTitle').innerText = 'Awaiting Telemetry Feed';
-      document.getElementById('diagDetails').innerText = 'Wrist HUD in standby. Connect suit ESP32 or select a simulator scenario.';
+      document.getElementById('diagDetails').innerText = 'System on standby. Connect wired sensor bus or select a simulator scenario.';
       document.getElementById('actionHeading').innerText = 'Standby State';
       document.getElementById('actionDescription').innerText = 'No emergency detected. Awaiting telemetry stream.';
-      document.getElementById('actuatorToast').innerText = 'Awaiting telemetry trigger...';
-      document.getElementById('actuatorToast').classList.remove('active-cmd');
     }
+
+    // --- 8. Mission BlackBox Logs & LocalStorage ---
     function saveLog(v) {
       logCache.unshift({
-        timestamp: new Date().toLocaleTimeString(),
         crew_name: activeCrewName,
+        timestamp: new Date().toISOString(),
         ...v
       });
       if (logCache.length > 35) logCache.pop();
@@ -1198,10 +1130,9 @@
     }
     function renderStorageLogs() {
       const display = document.getElementById('storageLogDisplay');
-      display.innerText = logCache.length ? JSON.stringify(logCache, null, 2) : 'No entries stored.';
+      display.innerText = logCache.length ? JSON.stringify(logCache, null, 2) : 'No flight entries recorded.';
     }
     function openStorageDrawer() {
-      closeAllDropdowns();
       document.getElementById('storageDrawer').classList.add('open');
       document.getElementById('drawerBackdrop').classList.add('show');
       renderStorageLogs();
@@ -1220,25 +1151,25 @@
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `astraea_cuff_logs_${Date.now()}.json`;
+      a.download = `flight_blackbox_${activeCrewName.replace(/\s+/g, '_')}_${Date.now()}.json`;
       a.click();
     }
     function toggleDropdown(e) {
       e.stopPropagation();
       document.getElementById('simDropdown').classList.toggle('active');
     }
-    function closeAllDropdowns() {
+    function closeDropdown() {
       document.getElementById('simDropdown').classList.remove('active');
     }
     window.addEventListener('click', function(e) {
       if (!e.target.closest('#simDropdown')) {
-        closeAllDropdowns();
+        closeDropdown();
       }
     });
     window.addEventListener('keydown', function(e) {
       if (e.key === 'Escape') {
         closeStorageDrawer();
-        closeAllDropdowns();
+        closeDropdown();
       }
     });
   </script>
