@@ -1128,24 +1128,29 @@
         renderStorageLogs();
       }
     }
+
     function renderStorageLogs() {
       const display = document.getElementById('storageLogDisplay');
       display.innerText = logCache.length ? JSON.stringify(logCache, null, 2) : 'No flight entries recorded.';
     }
+
     function openStorageDrawer() {
       document.getElementById('storageDrawer').classList.add('open');
       document.getElementById('drawerBackdrop').classList.add('show');
       renderStorageLogs();
     }
+
     function closeStorageDrawer() {
       document.getElementById('storageDrawer').classList.remove('open');
       document.getElementById('drawerBackdrop').classList.remove('show');
     }
+
     function clearStoredLogs() {
       logCache = [];
       localStorage.removeItem('astraea_logs');
       renderStorageLogs();
     }
+
     function exportStoredLogs() {
       const blob = new Blob([JSON.stringify(logCache, null, 2)], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
@@ -1154,18 +1159,23 @@
       a.download = `flight_blackbox_${activeCrewName.replace(/\s+/g, '_')}_${Date.now()}.json`;
       a.click();
     }
+
+    // --- 9. Dropdown & Keyboard Control ---
     function toggleDropdown(e) {
       e.stopPropagation();
       document.getElementById('simDropdown').classList.toggle('active');
     }
+
     function closeDropdown() {
       document.getElementById('simDropdown').classList.remove('active');
     }
+
     window.addEventListener('click', function(e) {
       if (!e.target.closest('#simDropdown')) {
         closeDropdown();
       }
     });
+
     window.addEventListener('keydown', function(e) {
       if (e.key === 'Escape') {
         closeStorageDrawer();
