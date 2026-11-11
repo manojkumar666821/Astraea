@@ -3,585 +3,1346 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Astraea - Team Victorious | NASA Space Apps Challenge 2026</title>
-  
-  <!-- Tailwind CSS for clean layout and styling -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  
-  <!-- Chart.js for simple biometrics graphing -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-  <!-- Google Font: Poppins (Clean, readable modern typography) -->
+  <title>Astraea - Astronaut EVA Cuff HUD | Team Victorious</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
-    /* Apply Poppins font to the entire document */
-    body, * {
-      font-family: 'Poppins', sans-serif;
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', sans-serif !important;
     }
 
-    /* Subtle custom card styling for the dark aerospace console */
-    .space-card {
-      background: rgba(15, 23, 42, 0.75);
-      backdrop-filter: blur(8px);
-      border: 1px solid rgba(56, 189, 248, 0.15);
-      border-radius: 1rem;
-      transition: all 0.2s ease-in-out;
+    body {
+      background-color: #040711;
+      color: #e2e8f0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      font-family: 'Poppins', sans-serif !important;
     }
-    
-    .space-card:hover {
-      border-color: rgba(56, 189, 248, 0.35);
+
+    /* Clean Poppins class for telemetry numbers */
+    .mono {
+      font-family: 'Poppins', sans-serif !important;
+      font-feature-settings: "tnum";
+      font-variant-numeric: tabular-nums;
     }
+
+    /* Top Sticky Alert */
+    #emergencyTopBanner {
+      display: none;
+      position: sticky;
+      top: 0;
+      height: 44px;
+      z-index: 1000;
+      background: linear-gradient(90deg, #7f1d1d, #dc2626);
+      color: #ffffff;
+      padding: 10px 20px;
+      text-align: center;
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: 0.5px;
+      box-shadow: 0 4px 20px rgba(220, 38, 38, 0.5);
+      animation: pulseAlert 1.2s infinite alternate;
+    }
+
+    @keyframes pulseAlert {
+      from { background-color: #991b1b; }
+      to { background-color: #ef4444; }
+    }
+
+    /* Header: Wearable HUD Framing */
+    header {
+      background: linear-gradient(180deg, #0a0f1d 0%, #060a14 100%);
+      border-bottom: 1px solid #1e293b;
+      padding: 16px 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      position: relative;
+      z-index: 50;
+    }
+
+    .title-group .sub-tag {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #38bdf8;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 2px;
+    }
+
+    .title-group .sub-tag::before {
+      content: "";
+      display: inline-block;
+      width: 4px;
+      height: 13px;
+      background-color: #38bdf8;
+      border-radius: 2px;
+      box-shadow: 0 0 8px #38bdf8;
+    }
+
+    .title-group h1 {
+      font-size: 22px;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: -0.3px;
+    }
+
+    .title-group p {
+      font-size: 11px;
+      color: #94a3b8;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      position: relative;
+    }
+
+    /* Action Buttons */
+    .btn {
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid transparent;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-hardware {
+      background-color: #0f172a;
+      color: #94a3b8;
+      border-color: #334155;
+    }
+    .btn-hardware.connected {
+      background-color: #064e3b;
+      color: #34d399;
+      border-color: #059669;
+      box-shadow: 0 0 10px rgba(52, 211, 153, 0.3);
+    }
+
+    .btn-primary {
+      background-color: #0284c7;
+      color: #ffffff;
+    }
+    .btn-primary:hover { background-color: #0369a1; }
+
+    .btn-secondary {
+      background-color: #1e293b;
+      color: #cbd5e1;
+      border-color: #334155;
+    }
+    .btn-secondary:hover { background-color: #334155; }
+
+    /* Dropdown Menus */
+    .dropdown {
+      position: relative;
+      display: inline-block;
+    }
+
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: calc(100% + 6px);
+      background-color: #0c1222;
+      min-width: 250px;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.7);
+      z-index: 200;
+      overflow: hidden;
+    }
+
+    .dropdown-content button {
+      width: 100%;
+      text-align: left;
+      padding: 10px 14px;
+      background: none;
+      border: none;
+      color: #cbd5e1;
+      font-size: 12px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      border-bottom: 1px solid #1a2333;
+    }
+
+    .dropdown-content button:hover {
+      background-color: #162032;
+      color: #38bdf8;
+    }
+
+    .dropdown-content button span.subtitle {
+      font-size: 10px;
+      color: #64748b;
+    }
+
+    .dropdown.active .dropdown-content {
+      display: block;
+    }
+
+    /* Main Container */
+    main {
+      padding: 16px 28px;
+      flex: 1;
+      max-width: 1600px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    /* Astronaut Crew Banner */
+    .crew-ribbon {
+      background: linear-gradient(90deg, #0c1322 0%, #111a2f 100%);
+      border: 1px solid #1e293b;
+      border-radius: 8px;
+      padding: 10px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .crew-info {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .crew-tag {
+      font-size: 11px;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .crew-name-input {
+      background: transparent;
+      border: none;
+      border-bottom: 1px dashed #38bdf8;
+      color: #ffffff;
+      font-weight: 600;
+      font-size: 13px;
+      padding: 2px 4px;
+      outline: none;
+      width: 180px;
+    }
+
+    .crew-name-input:focus {
+      border-bottom: 1px solid #38bdf8;
+      background-color: #0b1120;
+    }
+
+    .cuff-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      background-color: #1e293b;
+      padding: 4px 10px;
+      border-radius: 4px;
+      color: #38bdf8;
+      border: 1px solid #334155;
+    }
+
+    /* 4 Metrics Row */
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    @media (max-width: 1024px) {
+      .metric-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    .metric-card {
+      background-color: #0a0e1a;
+      border: 1px solid #1a2333;
+      border-radius: 8px;
+      padding: 14px 16px;
+      position: relative;
+      transition: all 0.2s ease;
+    }
+
+    .metric-card.alert-border {
+      border-color: #ef4444;
+      background-color: #1e0d12;
+      box-shadow: 0 0 12px rgba(239, 68, 68, 0.25);
+    }
+
+    .metric-title {
+      font-size: 11px;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .metric-val {
+      font-size: 34px;
+      font-weight: 700;
+      color: #ffffff;
+      margin: 4px 0 2px 0;
+    }
+
+    .metric-standard {
+      font-size: 10px;
+      color: #64748b;
+    }
+
+    /* Strict 2x2 Matrix Grid (No combined graphs) */
+    .charts-matrix {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      grid-template-rows: repeat(2, auto);
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    @media (max-width: 900px) {
+      .charts-matrix { grid-template-columns: 1fr; }
+    }
+
+    .chart-box {
+      background-color: #0a0e1a;
+      border: 1px solid #1a2333;
+      border-radius: 8px;
+      padding: 12px 16px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .chart-header h3 {
+      font-size: 12px;
+      font-weight: 600;
+      color: #cbd5e1;
+    }
+
+    .chart-container {
+      position: relative;
+      height: 150px;
+      width: 100%;
+    }
+
+    /* Suit Actuators & Countermeasures Panel (Interactive from site!) */
+    .actuators-section {
+      background: linear-gradient(180deg, #0b101e 0%, #080c17 100%);
+      border: 1px solid #1e293b;
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin-bottom: 16px;
+    }
+
+    .actuators-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .actuators-header h3 {
+      font-size: 13px;
+      font-weight: 700;
+      color: #38bdf8;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .actuator-status-toast {
+      font-size: 11px;
+      color: #94a3b8;
+    }
+
+    .actuator-status-toast.active-cmd {
+      color: #34d399;
+      font-weight: 600;
+    }
+
+    .actuator-status-toast.err-cmd {
+      color: #f87171;
+      font-weight: 600;
+    }
+
+    .actuator-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    @media (max-width: 1024px) {
+      .actuator-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 600px) {
+      .actuator-grid { grid-template-columns: 1fr; }
+    }
+
+    .actuator-card {
+      background-color: #060913;
+      border: 1px solid #1e293b;
+      border-radius: 6px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .actuator-card h4 {
+      font-size: 11px;
+      font-weight: 600;
+      color: #cbd5e1;
+    }
+
+    .actuator-card p {
+      font-size: 10px;
+      color: #64748b;
+      line-height: 1.4;
+    }
+
+    .actuator-btn {
+      padding: 8px 10px;
+      border-radius: 5px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid #334155;
+      background-color: #111a2f;
+      color: #94a3b8;
+      transition: all 0.2s;
+      text-align: center;
+    }
+
+    .actuator-btn:hover {
+      background-color: #1e293b;
+      color: #ffffff;
+    }
+
+    /* Glowing Urgent Directive on specific button when anomaly strikes */
+    .actuator-card.urgent-target {
+      border-color: #ef4444;
+      background-color: #240d12;
+      box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
+    }
+
+    .actuator-card.urgent-target .actuator-btn {
+      background: linear-gradient(90deg, #b91c1c, #dc2626);
+      color: #ffffff;
+      border-color: #f87171;
+      animation: actuatorBlink 0.9s infinite alternate;
+      font-weight: 700;
+    }
+
+    @keyframes actuatorBlink {
+      from { box-shadow: 0 0 4px #dc2626; }
+      to { box-shadow: 0 0 14px #f87171; }
+    }
+
+    /* Decision Area */
+    .decision-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    @media (max-width: 768px) {
+      .decision-grid { grid-template-columns: 1fr; }
+    }
+
+    .decision-card {
+      background-color: #0a0e1a;
+      border: 1px solid #1a2333;
+      border-radius: 8px;
+      padding: 16px 18px;
+    }
+
+    .decision-card h3 {
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #38bdf8;
+    }
+
+    .action-directive-box {
+      padding: 12px 14px;
+      border-radius: 6px;
+      background-color: #060913;
+      border-left: 4px solid #334155;
+      font-size: 11px;
+      line-height: 1.5;
+      color: #94a3b8;
+    }
+
+    .action-blink {
+      background-color: #2b1115 !important;
+      border-left: 4px solid #ef4444 !important;
+      color: #fecaca !important;
+      animation: directiveBlink 1s infinite alternate;
+    }
+
+    @keyframes directiveBlink {
+      from { border-left-color: #dc2626; box-shadow: 0 0 4px rgba(220,38,38,0.2); }
+      to { border-left-color: #f87171; box-shadow: 0 0 12px rgba(239,68,68,0.5); }
+    }
+
+    /* Local Storage Drawer (Clean Offset below Banner) */
+    #storageDrawer {
+      position: fixed;
+      top: 44px;
+      right: -420px;
+      width: 400px;
+      height: calc(100vh - 44px);
+      background-color: #0a0e1a;
+      border-left: 1px solid #1e293b;
+      z-index: 900;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      transition: right 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: -10px 0 30px rgba(0,0,0,0.7);
+    }
+
+    #storageDrawer.open {
+      right: 0;
+    }
+
+    .drawer-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #1e293b;
+    }
+
+    .close-log-btn {
+      background-color: #ef4444;
+      color: #ffffff;
+      border: none;
+      padding: 5px 12px;
+      border-radius: 5px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .close-log-btn:hover { background-color: #dc2626; }
+
+    .drawer-content {
+      flex: 1;
+      overflow-y: auto;
+      font-size: 11px;
+      background-color: #040711;
+      border: 1px solid #1a2333;
+      border-radius: 6px;
+      padding: 10px;
+      color: #38bdf8;
+      font-family: 'Poppins', sans-serif !important;
+      white-space: pre-wrap;
+    }
+
+    #drawerBackdrop {
+      display: none;
+      position: fixed;
+      top: 44px;
+      left: 0;
+      width: 100%;
+      height: calc(100vh - 44px);
+      background: rgba(0,0,0,0.5);
+      z-index: 850;
+    }
+
+    #drawerBackdrop.show { display: block; }
+
+    /* Footer */
+    footer {
+      background-color: #040711;
+      border-top: 1px solid #1a2333;
+      padding: 14px 28px;
+      text-align: center;
+      font-size: 11px;
+      color: #64748b;
+      margin-top: 20px;
+    }
+
+    footer strong { color: #94a3b8; }
   </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between">
+<body>
 
-  <!-- ============================================================
-       TOP NAVIGATION BAR (TEAM VICTORIOUS + MISSION IDENTIFICATION)
-       ============================================================ -->
-  <header class="border-b border-slate-800 bg-slate-900/90 sticky top-0 z-30 px-4 py-3 sm:px-6">
-    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
-      
-      <!-- Brand & Team Banner -->
-      <div class="flex items-center gap-3">
-        <!-- <span class="px-3 py-1 rounded-full text-xs font-bold tracking-wider bg-gradient-to-r from-sky-500 to-indigo-600 text-white shadow-md shadow-sky-500/20">
-          TEAM VICTORIOUS
-        </span> -->
-        <span class="text-slate-500 hidden sm:inline">|</span>
-        <span class="text-sm font-semibold tracking-wide text-sky-400">
-          Astraea <span class="text-xs text-slate-400 font-normal">Autonomous Health Officer</span>
-        </span>
-      </div>
+  <!-- Sticky Alert Header -->
+  <div id="emergencyTopBanner">
+    CRITICAL ANOMALY: <span id="bannerDiagnosisText">HYPERCAPNIA DETECTED</span> | DIRECTIVE: <span id="bannerActionText">ENGAGE SECONDARY SCRUBBERS</span>
+  </div>
 
-      <!-- Mars Orbital Latency & Gemini API Button -->
-      <div class="flex items-center gap-3 text-xs">
-        <!-- Mars-Earth Comm Delay Counter -->
-        <div class="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-lg bg-slate-800 border border-slate-700 text-slate-300">
-          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-          <span>Earth Delay:</span>
-          <strong id="latencyDisplay" class="text-sky-300">14m 22s</strong>
-        </div>
+  <!-- Header -->
+  <header>
+    <div class="title-group">
+      <div class="sub-tag">Astronaut Forearm Wearable Cybernetic Interface</div>
+      <h1>EVA Suit Cuff HUD & Telemetry Control</h1>
+      <p>NASA Spaceflight Human-System Standards (<strong>NASA-STD-3001</strong>) Compliant System</p>
+    </div>
 
-        <!-- API Key Config Button -->
-        <button onclick="openApiModal()" id="apiKeyBtn" class="px-3 py-1.5 rounded-lg bg-indigo-900/80 hover:bg-indigo-800 border border-indigo-500/40 text-indigo-200 transition font-medium">
-          Set Gemini API Key
+    <div class="header-actions">
+      <!-- Direct Hardware Web Serial Button -->
+      <button class="btn btn-hardware" id="btnHardwareSerial" onclick="toggleWebSerial()">
+        <span class="mono">🔌</span>
+        <span id="hardwareBtnText">Connect Suit ESP32</span>
+      </button>
+
+      <!-- Simulator Presets Dropdown -->
+      <div class="dropdown" id="simDropdown">
+        <button class="btn btn-primary" onclick="toggleDropdown(event)">
+          📡 Telemetry Simulator ▾
         </button>
+        <div class="dropdown-content">
+          <button onclick="setScenario('nominal')">
+            <span>1. Nominal Baseline</span>
+            <span class="subtitle">Stable vitals within standard limits</span>
+          </button>
+          <button onclick="setScenario('hypercapnia')">
+            <span>2. ppCO2 Scrub Failure</span>
+            <span class="subtitle">ppCO2 > 3.8 mmHg, Cardiac Strain</span>
+          </button>
+          <button onclick="setScenario('decompression')">
+            <span>3. Suit Micro-Decompression</span>
+            <span class="subtitle">Pressure < 90 kPa, SpO2 Drop</span>
+          </button>
+          <button onclick="setScenario('eva')">
+            <span>4. Heavy EVA Exertion</span>
+            <span class="subtitle">Pulse > 130 BPM, Heat Load</span>
+          </button>
+          <button onclick="clearTelemetry()" style="color: #ef4444;">
+            <span>✖ Reset / Disconnect</span>
+            <span class="subtitle">Set to standby (-- values)</span>
+          </button>
+        </div>
       </div>
 
+      <button class="btn btn-secondary" onclick="openStorageDrawer()">
+        💾 Local Storage
+      </button>
     </div>
   </header>
 
-  <!-- ============================================================
-       MAIN CONTENT CONTAINER
-       ============================================================ -->
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 py-6 w-full space-y-6">
+  <!-- Main Body -->
+  <main>
+    <!-- Crew Identity Ribbon -->
+    <div class="crew-ribbon">
+      <div class="crew-info">
+        <div>
+          <span class="crew-tag">Astronaut: </span>
+          <input type="text" id="crewNameInput" class="crew-name-input" value="CDR. Alex Vance" title="Click to edit astronaut name" onchange="updateCrewName()">
+        </div>
+        <div>
+          <span class="crew-tag">Callsign: </span>
+          <span style="font-weight: 600; font-size: 12px; color: #cbd5e1;">VICTORIOUS-1</span>
+        </div>
+        <div>
+          <span class="crew-tag">Suit Unit: </span>
+          <span class="mono" style="font-size: 11px; color: #38bdf8;">EMU-SER-4089</span>
+        </div>
+      </div>
+      <div class="cuff-badge">
+        <span>WRIST HUD MOUNT: ACTIVE</span>
+      </div>
+    </div>
 
-    <!-- Mission Header & Quick Overview -->
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-slate-800/80 pb-4">
-      <div>
-        <h1 class="text-2xl sm:text-3xl font-bold text-white tracking-tight">
-          Crew Health &amp; Cabin Monitoring
-        </h1>
-        <p class="text-xs sm:text-sm text-slate-400 mt-1">
-          Deep-space telemetry cross-correlation compliant with <span class="text-sky-400 font-medium">NASA-STD-3001</span> aerospace limits.
+    <!-- 4 Metrics Row (Starts strictly with --) -->
+    <div class="metric-grid">
+      <div class="metric-card" id="cardHR">
+        <div class="metric-title">
+          <span>Heart Rate</span>
+          <span class="mono">BPM</span>
+        </div>
+        <div class="metric-val mono" id="valHR">--</div>
+        <div class="metric-standard">NASA-STD-3001: 60 - 100 BPM</div>
+      </div>
+
+      <div class="metric-card" id="cardSpO2">
+        <div class="metric-title">
+          <span>Blood Oxygen</span>
+          <span class="mono">SpO₂</span>
+        </div>
+        <div class="metric-val mono" id="valSpO2">--</div>
+        <div class="metric-standard">Nominal: 95% - 100%</div>
+      </div>
+
+      <div class="metric-card" id="cardPressure">
+        <div class="metric-title">
+          <span>Suit / Cabin Pressure</span>
+          <span class="mono">kPa</span>
+        </div>
+        <div class="metric-val mono" id="valPressure">--</div>
+        <div class="metric-standard">Nominal: 97 - 103 kPa</div>
+      </div>
+
+      <div class="metric-card" id="cardCO2">
+        <div class="metric-title">
+          <span>Suit / Cabin CO₂</span>
+          <span class="mono">ppCO₂</span>
+        </div>
+        <div class="metric-val mono" id="valCO2">--</div>
+        <div class="metric-standard">NASA Max: &le; 3.0 mmHg</div>
+      </div>
+    </div>
+
+    <!-- Strict 2x2 Matrix Graph Layout (4 Independent Curves) -->
+    <div class="charts-matrix">
+      <!-- (1,1) Heart Rate -->
+      <div class="chart-box">
+        <div class="chart-header">
+          <h3>Crew Heart Rate (BPM)</h3>
+          <span class="mono" style="font-size: 10px; color: #64748b;">Live Biosensor Wave</span>
+        </div>
+        <div class="chart-container">
+          <canvas id="chartHR"></canvas>
+        </div>
+      </div>
+
+      <!-- (1,2) SpO2 -->
+      <div class="chart-box">
+        <div class="chart-header">
+          <h3>Blood Oxygen Saturation (SpO₂ %)</h3>
+          <span class="mono" style="font-size: 10px; color: #64748b;">Pulse Oximetry</span>
+        </div>
+        <div class="chart-container">
+          <canvas id="chartSpO2"></canvas>
+        </div>
+      </div>
+
+      <!-- (2,1) Suit Pressure -->
+      <div class="chart-box">
+        <div class="chart-header">
+          <h3>Spacesuit Internal Pressure (kPa)</h3>
+          <span class="mono" style="font-size: 10px; color: #64748b;">Barometric Sensor</span>
+        </div>
+        <div class="chart-container">
+          <canvas id="chartPressure"></canvas>
+        </div>
+      </div>
+
+      <!-- (2,2) ppCO2 -->
+      <div class="chart-box">
+        <div class="chart-header">
+          <h3>Partial Pressure CO₂ (ppCO₂ mmHg)</h3>
+          <span class="mono" style="font-size: 10px; color: #64748b;">ECLSS Scrubber Feed</span>
+        </div>
+        <div class="chart-container">
+          <canvas id="chartCO2"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Interactive Suit Actuators Panel (Can be triggered directly from the HUD!) -->
+    <div class="actuators-section">
+      <div class="actuators-header">
+        <h3>⚡ SUIT LIFE-SUPPORT ACTUATORS & COUNTERMEASURES (HUD CONTROL)</h3>
+        <span class="actuator-status-toast" id="actuatorToast">Awaiting telemetry trigger...</span>
+      </div>
+      <div class="actuator-grid">
+        <!-- Actuator 1: LiOH Scrubber -->
+        <div class="actuator-card" id="actCardScrubber">
+          <div>
+            <h4>Secondary LiOH Scrubber</h4>
+            <p>Overrides ECLSS loop to clear toxic carbon dioxide accumulation.</p>
+          </div>
+          <button class="actuator-btn" id="btnActScrubber" onclick="executeActuator('SCRUBBER', 'Secondary LiOH Scrubber Loop Overridden')">
+            Engage Scrubber
+          </button>
+        </div>
+
+        <!-- Actuator 2: Pressure Seal -->
+        <div class="actuator-card" id="actCardPressure">
+          <div>
+            <h4>IVA Seal & O₂ Purge</h4>
+            <p>Seals suit pressure valves and initiates positive oxygen flow.</p>
+          </div>
+          <button class="actuator-btn" id="btnActPressure" onclick="executeActuator('PRESSURE_SEAL', 'Suit Seal & 100% O2 Purge Activated')">
+            Deploy Suit Seal
+          </button>
+        </div>
+
+        <!-- Actuator 3: Liquid Cooling Garment (LCG) -->
+        <div class="actuator-card" id="actCardCooling">
+          <div>
+            <h4>Liquid Cooling Garment (LCG)</h4>
+            <p>Boosts coolant flow rate to dissipate extreme metabolic EVA heat.</p>
+          </div>
+          <button class="actuator-btn" id="btnActCooling" onclick="executeActuator('COOLING_BOOST', 'Liquid Cooling Flow Increased to Max')">
+            Boost Cooling Loop
+          </button>
+        </div>
+
+        <!-- Actuator 4: Automated Medical Injection -->
+        <div class="actuator-card" id="actCardMed">
+          <div>
+            <h4>Anti-Hypoxia Drug Auto-Injector</h4>
+            <p>Intra-suit pharmacological countermeasure for critical vital drop.</p>
+          </div>
+          <button class="actuator-btn" id="btnActMed" onclick="executeActuator('MED_INJECT', 'Emergency Drug Dose Administered')">
+            Authorize Injector
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Clinical Decision & Action Required -->
+    <div class="decision-grid">
+      <div class="decision-card">
+        <h3>Autonomous Clinical Evaluation</h3>
+        <div style="margin-bottom: 6px;">
+          <strong style="font-size: 11px; color: #64748b;">Diagnostic Assessment:</strong>
+          <div id="diagTitle" style="font-size: 15px; font-weight: 600; color: #ffffff; margin-top: 2px;">
+            Awaiting Telemetry Feed
+          </div>
+        </div>
+        <p id="diagDetails" style="font-size: 11px; color: #94a3b8; line-height: 1.5;">
+          Connect suit hardware or select a simulator scenario to initiate clinical cross-correlation.
         </p>
       </div>
 
-      <!-- Quick Badges -->
-      <div class="flex items-center gap-2">
-        <span class="text-[11px] px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-700 text-slate-300">
-          Mission: <strong>Ares Mars Transit</strong>
-        </span>
-        <span class="text-[11px] px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-700 text-slate-300">
-          Crew: <strong>Cmdr. Alex Vance</strong>
-        </span>
-      </div>
-    </div>
-
-    <!-- ============================================================
-         SCENARIO SWITCHER (PRESETS FOR VIDEO RECORDING & DEMO)
-         ============================================================ -->
-    <div class="space-card p-4">
-      <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
-        <span class="text-xs font-semibold text-slate-300 uppercase tracking-wider">
-          Select Simulated Mission Scenario:
-        </span>
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 w-full md:w-auto">
-          <button onclick="loadScenario('nominal')" id="btn-nominal" class="scenario-btn px-3 py-2 rounded-lg text-xs font-semibold bg-sky-600 text-white shadow-md border border-sky-400 transition">
-            1. Normal Flight
-          </button>
-          <button onclick="loadScenario('hypercapnia')" id="btn-hypercapnia" class="scenario-btn px-3 py-2 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700 transition">
-            2. CO2 Spike
-          </button>
-          <button onclick="loadScenario('decompression')" id="btn-decompression" class="scenario-btn px-3 py-2 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700 transition">
-            3. Decompression
-          </button>
-          <button onclick="loadScenario('spacewalk')" id="btn-spacewalk" class="scenario-btn px-3 py-2 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700 transition">
-            4. EVA Spacewalk
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================
-         TELEMETRY METRICS GRID (5 CARDS)
-         ============================================================ -->
-    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
-      
-      <!-- Card 1: Heart Rate -->
-      <div class="space-card p-4 flex flex-col justify-between">
-        <span class="text-xs text-slate-400 font-medium">Heart Rate</span>
-        <div class="my-2">
-          <span id="metric-hr" class="text-2xl sm:text-3xl font-bold text-white">72</span>
-          <span class="text-xs text-slate-400 ml-1">BPM</span>
-        </div>
-        <span class="text-[11px] text-slate-500">Nominal: 60-100</span>
-      </div>
-
-      <!-- Card 2: SpO2 -->
-      <div class="space-card p-4 flex flex-col justify-between">
-        <span class="text-xs text-slate-400 font-medium">Blood Oxygen (SpO2)</span>
-        <div class="my-2">
-          <span id="metric-spo2" class="text-2xl sm:text-3xl font-bold text-white">98</span>
-          <span class="text-xs text-slate-400 ml-1">%</span>
-        </div>
-        <span class="text-[11px] text-slate-500">Nominal: &ge; 95%</span>
-      </div>
-
-      <!-- Card 3: Cabin CO2 -->
-      <div class="space-card p-4 flex flex-col justify-between">
-        <span class="text-xs text-slate-400 font-medium">Cabin ppCO2</span>
-        <div class="my-2">
-          <span id="metric-co2" class="text-2xl sm:text-3xl font-bold text-white">1.8</span>
-          <span class="text-xs text-slate-400 ml-1">mmHg</span>
-        </div>
-        <span class="text-[11px] text-slate-500">Limit: &le; 3.0 mmHg</span>
-      </div>
-
-      <!-- Card 4: Cabin Pressure -->
-      <div class="space-card p-4 flex flex-col justify-between">
-        <span class="text-xs text-slate-400 font-medium">Cabin Pressure</span>
-        <div class="my-2">
-          <span id="metric-press" class="text-2xl sm:text-3xl font-bold text-white">101.3</span>
-          <span class="text-xs text-slate-400 ml-1">kPa</span>
-        </div>
-        <span class="text-[11px] text-slate-500">Nominal: 97-103</span>
-      </div>
-
-      <!-- Card 5: Core Temperature -->
-      <div class="space-card p-4 flex flex-col justify-between col-span-2 sm:col-span-1">
-        <span class="text-xs text-slate-400 font-medium">Core Temp</span>
-        <div class="my-2">
-          <span id="metric-temp" class="text-2xl sm:text-3xl font-bold text-white">36.8</span>
-          <span class="text-xs text-slate-400 ml-1">&deg;C</span>
-        </div>
-        <span class="text-[11px] text-slate-500">Nominal: 36.5-37.5</span>
-      </div>
-
-    </div>
-
-    <!-- ============================================================
-         LOWER GRID: VITAL CHART (LEFT) & CLINICAL DECISION BOX (RIGHT)
-         ============================================================ -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-
-      <!-- LEFT: Simple Live Chart (7 Cols) -->
-      <div class="lg:col-span-7 space-card p-5 flex flex-col justify-between">
-        <div class="flex items-center justify-between mb-3 border-b border-slate-800 pb-2">
-          <h2 class="text-sm font-semibold text-white">Live Telemetry Trend Waveform</h2>
-          <span class="text-xs text-slate-400">1.0 Hz Real-Time Loop</span>
-        </div>
-        <div class="h-56 w-full">
-          <canvas id="simpleTrendChart"></canvas>
-        </div>
-      </div>
-
-      <!-- RIGHT: Autonomous Clinical Decision Support (5 Cols) -->
-      <div class="lg:col-span-5 space-card p-5 space-y-4 border-indigo-500/30">
-        
-        <!-- Header & Action Button -->
-        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-          <div class="flex items-center gap-2">
-            <span class="w-2.5 h-2.5 rounded-full bg-indigo-400 animate-ping"></span>
-            <h2 class="text-sm font-bold text-white">Autonomous Decision Officer</h2>
-          </div>
-          <span id="engineBadge" class="text-[10px] px-2 py-0.5 rounded bg-indigo-950 text-indigo-300 border border-indigo-500/30 font-medium">
-            OFFLINE RULE ENGINE
+      <div class="decision-card">
+        <h3>Immediate Action Directive</h3>
+        <div class="action-directive-box" id="actionDirectiveBox">
+          <strong id="actionHeading" style="display: block; font-size: 12px; color: #cbd5e1; margin-bottom: 2px;">
+            Standby State
+          </strong>
+          <span id="actionDescription">
+            No emergency detected. Wrist HUD waiting for telemetry feed.
           </span>
         </div>
-
-        <!-- Evaluation Trigger Button -->
-        <button onclick="evaluateHealthCondition()" id="evalBtn" class="w-full py-2.5 px-4 rounded-xl text-xs font-semibold text-white bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 transition shadow-lg shadow-indigo-900/40">
-          Run NASA Standard Clinical Diagnosis
-        </button>
-
-        <!-- Diagnosis Display Card -->
-        <div class="bg-slate-900/90 p-4 rounded-xl border border-slate-800 space-y-3 text-xs">
-          
-          <!-- Diagnosis Name -->
-          <div>
-            <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block">Primary Diagnosis</span>
-            <p id="diagTitle" class="text-sm font-bold text-emerald-400 mt-0.5">
-              Normal Physiological Baseline
-            </p>
-          </div>
-
-          <!-- NASA Standard Violated -->
-          <div>
-            <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block">NASA Standards Status</span>
-            <p id="diagStandard" class="text-slate-300 mt-0.5">
-              NASA-STD-3001: All vitals within compliant safe boundaries.
-            </p>
-          </div>
-
-          <!-- Immediate Action Protocol -->
-          <div>
-            <span class="text-[10px] font-semibold text-amber-400 uppercase tracking-wider block">Immediate Action Protocol</span>
-            <p id="diagAction" class="text-slate-300 mt-0.5">
-              Continue regular flight roster. Maintain standard 2.5L daily hydration.
-            </p>
-          </div>
-
-          <!-- Medical Kit Prescription -->
-          <div>
-            <span class="text-[10px] font-semibold text-purple-400 uppercase tracking-wider block">Spaceflight Medical Kit</span>
-            <p id="diagRx" class="text-slate-300 mt-0.5">
-              None required. Routine multivitamin supplement.
-            </p>
-          </div>
-
-        </div>
-
       </div>
-
     </div>
-
   </main>
 
-  <!-- ============================================================
-       MODAL: GEMINI API KEY SETUP
-       ============================================================ -->
-  <div id="apiModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-    <div class="bg-slate-900 border border-slate-700 p-6 rounded-2xl max-w-md w-full space-y-4">
-      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-        <h3 class="text-sm font-bold text-white">Setup Gemini API Key</h3>
-        <button onclick="closeApiModal()" class="text-slate-400 hover:text-white text-lg">&times;</button>
-      </div>
-
-      <p class="text-xs text-slate-300 leading-relaxed">
-        Paste your free Gemini API key from 
-        <a href="https://aistudio.google.com" target="_blank" class="text-sky-400 underline font-medium">Google AI Studio</a>. 
-        If you don't enter one, the app works 100% offline using standard built-in rules!
-      </p>
-
-      <input type="password" id="apiKeyInput" placeholder="Paste AIzaSy... key here" class="w-full px-3 py-2 rounded-lg bg-slate-950 border border-slate-700 text-xs text-white focus:outline-none focus:border-sky-500">
-
-      <div class="flex items-center justify-end gap-2 pt-2">
-        <button onclick="clearApiKey()" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-rose-400 hover:bg-rose-950/40">Clear</button>
-        <button onclick="saveApiKey()" class="px-4 py-1.5 rounded-lg text-xs font-semibold bg-sky-600 hover:bg-sky-500 text-white">Save Key</button>
-      </div>
+  <!-- Storage Drawer & Backdrop -->
+  <div id="drawerBackdrop" onclick="closeStorageDrawer()"></div>
+  <div id="storageDrawer">
+    <div class="drawer-header">
+      <h3 style="font-size: 13px; font-weight: 600; color: #ffffff;">Saved LocalStorage Logs</h3>
+      <button class="close-log-btn" onclick="closeStorageDrawer()">✕ Close Drawer</button>
+    </div>
+    <div class="drawer-content" id="storageLogDisplay">Loading logs...</div>
+    <div style="margin-top: 12px; display: flex; gap: 8px;">
+      <button class="btn btn-secondary" style="flex: 1; font-size: 11px;" onclick="clearStoredLogs()">Clear Logs</button>
+      <button class="btn btn-primary" style="flex: 1; font-size: 11px;" onclick="exportStoredLogs()">Export JSON</button>
     </div>
   </div>
 
-  <!-- ============================================================
-       FOOTER: PROMINENT TEAM VICTORIOUS CREDITS & CITATIONS
-       ============================================================ -->
-  <footer class="border-t border-slate-800 bg-slate-900/80 px-4 py-6 mt-8 text-center text-xs text-slate-400 space-y-2">
-    <p class="text-sm font-bold text-slate-200 tracking-wide">
-      Developed with pride by <span class="text-sky-400">TEAM VICTORIOUS</span> | NASA Space Apps Challenge 2026
-    </p>
-    <p class="text-[11px] text-slate-500">
-      Universal Event (Virtual Track) &bull; Designed for Deep-Space Astronaut Clinical Support
-    </p>
-    <div class="flex flex-wrap items-center justify-center gap-3 pt-1 text-[11px] text-slate-400">
-      <span>Data Standard: <strong class="text-slate-300">NASA-STD-3001 (Vol 1 &amp; 2)</strong></span>
-      <span>&bull;</span>
-      <span>Baseline Archive: <strong class="text-slate-300">NASA Life Sciences Data Archive (LSDA)</strong></span>
-    </div>
+  <!-- Footer -->
+  <footer>
+    Developed by <strong>Team Victorious</strong> | NASA Space Apps Challenge 2026 | NASA-STD-3001 Compliant Wearable Architecture
   </footer>
 
-  <!-- ============================================================
-       JAVASCRIPT: CLEAN, PLAIN, AND EASY-TO-UNDERSTAND CODE
-       ============================================================ -->
   <script>
-    // -----------------------------------------------------------------
-    // 1. SIMPLE STATE: Holds current telemetry values
-    // -----------------------------------------------------------------
-    let telemetry = {
-      hr: 72,         // Heart Rate (BPM)
-      spo2: 98,       // Blood Oxygen (%)
-      co2: 1.8,       // Cabin CO2 (mmHg)
-      press: 101.3,   // Cabin Pressure (kPa)
-      temp: 36.8,     // Core Temperature (°C)
-      scenario: 'nominal'
-    };
+    // --- 1. Global State ---
+    let telemetryInterval = null;
+    let phase = 0;
+    let activeCrewName = localStorage.getItem('astraea_crew_name') || 'CDR. Alex Vance';
+    let logCache = JSON.parse(localStorage.getItem('astraea_logs') || '[]');
+    let serialPort = null;
+    let serialReader = null;
+    let serialWriter = null;
 
-    // -----------------------------------------------------------------
-    // 2. PRESET SCENARIOS FOR EASY DEMO SWITCHING
-    // -----------------------------------------------------------------
-    const scenarioPresets = {
-      nominal: {
-        hr: 72, spo2: 98, co2: 1.8, press: 101.3, temp: 36.8,
-        diagTitle: "Normal Physiological Baseline",
-        color: "text-emerald-400",
-        standard: "NASA-STD-3001: All vitals within compliant safe boundaries.",
-        action: "Continue regular flight roster. Maintain standard 2.5L daily hydration.",
-        rx: "None required. Routine multivitamin supplement."
-      },
-      hypercapnia: {
-        hr: 110, spo2: 93, co2: 5.6, press: 101.1, temp: 37.1,
-        diagTitle: "Acute Hypercapnia (CO2 Poisoning)",
-        color: "text-rose-400",
-        standard: "VIOLATION: Cabin ppCO2 (5.6 mmHg) exceeds NASA-STD-3001 threshold (<= 3.0 mmHg).",
-        action: "Don Quick-Don emergency oxygen mask immediately. Switch ECLSS to backup Amine Scrubber Bed B.",
-        rx: "Administer Ibuprofen 400mg PO for CO2-induced vascular headache."
-      },
-      decompression: {
-        hr: 125, spo2: 88, co2: 1.2, press: 69.2, temp: 36.2,
-        diagTitle: "Cabin Micro-Decompression Hazard",
-        color: "text-rose-400",
-        standard: "CRITICAL: Cabin Pressure (69.2 kPa) fell below safety limit of 70.3 kPa (NASA-STD-3001).",
-        action: "Evacuate to Safe Haven Module Node-2 and seal emergency pressure bulkhead hatch.",
-        rx: "100% High-Flow O2 pre-breathe protocol to prevent tissue nitrogen bubble formation (DCS)."
-      },
-      spacewalk: {
-        hr: 138, spo2: 96, co2: 2.3, press: 100.9, temp: 38.2,
-        diagTitle: "Exertional Heat Exhaustion (EVA Strain)",
-        color: "text-amber-400",
-        standard: "VIOLATION: Core temperature (38.2°C) exceeds thermal limit (NASA-STD-3001 Vol 1).",
-        action: "Cease manual EVA tasks for 15 minutes. Increase spacesuit Liquid Cooling Garment (LCVG) flow to maximum.",
-        rx: "Ingest 500 mL electrolyte hydration drink via helmet in-suit drink bag."
-      }
-    };
+    // Initialize Crew Name Input
+    document.getElementById('crewNameInput').value = activeCrewName;
 
-    // -----------------------------------------------------------------
-    // 3. LOAD SCENARIO FUNCTION: Triggered when scenario button is clicked
-    // -----------------------------------------------------------------
-    function loadScenario(name) {
-      telemetry.scenario = name;
-      const s = scenarioPresets[name];
-
-      // Update telemetry state
-      telemetry.hr = s.hr;
-      telemetry.spo2 = s.spo2;
-      telemetry.co2 = s.co2;
-      telemetry.press = s.press;
-      telemetry.temp = s.temp;
-
-      // Update screen text
-      document.getElementById('metric-hr').innerText = s.hr;
-      document.getElementById('metric-spo2').innerText = s.spo2;
-      document.getElementById('metric-co2').innerText = s.co2;
-      document.getElementById('metric-press').innerText = s.press;
-      document.getElementById('metric-temp').innerText = s.temp;
-
-      // Update button colors
-      document.querySelectorAll('.scenario-btn').forEach(btn => {
-        btn.className = "scenario-btn px-3 py-2 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700 transition";
-      });
-      document.getElementById(`btn-${name}`).className = "scenario-btn px-3 py-2 rounded-lg text-xs font-semibold bg-sky-600 text-white shadow-md border border-sky-400 transition";
-
-      // Instantly run the diagnosis
-      displayDiagnosis(s.diagTitle, s.color, s.standard, s.action, s.rx);
+    function updateCrewName() {
+      const input = document.getElementById('crewNameInput');
+      activeCrewName = input.value.trim() || 'Astronaut';
+      localStorage.setItem('astraea_crew_name', activeCrewName);
     }
 
-    // Helper to display diagnosis result
-    function displayDiagnosis(title, colorClass, standard, action, rx) {
-      const titleEl = document.getElementById('diagTitle');
-      titleEl.innerText = title;
-      titleEl.className = `text-sm font-bold ${colorClass} mt-0.5`;
+    // --- 2. Chart Configurations (Fluid Smooth Monotone Waves) ---
+    function createSmoothChart(canvasId, color, yMin, yMax) {
+      const ctx = document.getElementById(canvasId).getContext('2d');
+      const gradient = ctx.createLinearGradient(0, 0, 0, 150);
+      gradient.addColorStop(0, color + '33');
+      gradient.addColorStop(1, color + '00');
 
-      document.getElementById('diagStandard').innerText = standard;
-      document.getElementById('diagAction').innerText = action;
-      document.getElementById('diagRx').innerText = rx;
-    }
-
-    // -----------------------------------------------------------------
-    // 4. CLINICAL DECISION EVALUATOR (DUAL MODE: GEMINI OR OFFLINE RULE)
-    // -----------------------------------------------------------------
-    async function evaluateHealthCondition() {
-      const apiKey = localStorage.getItem('victorious_gemini_key');
-      const evalBtn = document.getElementById('evalBtn');
-      const engineBadge = document.getElementById('engineBadge');
-
-      evalBtn.innerText = "Analyzing Telemetry...";
-      evalBtn.disabled = true;
-
-      // MODE A: If API Key exists, call Google Gemini 1.5 Flash
-      if (apiKey) {
-        try {
-          engineBadge.innerText = "GEMINI-1.5-FLASH (LIVE)";
-          
-          const prompt = `You are a NASA Flight Surgeon analyzing an astronaut's telemetry during deep space transit:
-- Heart Rate: ${telemetry.hr} BPM
-- SpO2: ${telemetry.spo2}%
-- Cabin CO2: ${telemetry.co2} mmHg (NASA-STD-3001 limit <= 3.0)
-- Cabin Pressure: ${telemetry.press} kPa (nominal 97-103)
-- Core Temp: ${telemetry.temp} °C
-Respond ONLY with a JSON object:
-{"title": "diagnosis", "color": "text-rose-400 or text-emerald-400 or text-amber-400", "standard": "violation summary", "action": "immediate action", "rx": "prescription"}`;
-
-          const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
-          const res = await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
-          });
-
-          const data = await res.json();
-          const raw = data.candidates[0].content.parts[0].text;
-          const clean = raw.replace(/```json|```/g, '').trim();
-          const parsed = JSON.parse(clean);
-
-          displayDiagnosis(parsed.title, parsed.color || "text-sky-400", parsed.standard, parsed.action, parsed.rx);
-        } catch (err) {
-          console.warn("Gemini call error. Using offline rule fallback:", err);
-          engineBadge.innerText = "OFFLINE RULE ENGINE (FALLBACK)";
-          const s = scenarioPresets[telemetry.scenario];
-          displayDiagnosis(s.diagTitle, s.color, s.standard, s.action, s.rx);
-        }
-      } else {
-        // MODE B: Offline Deterministic Engine (Zero Failure guarantee)
-        setTimeout(() => {
-          engineBadge.innerText = "OFFLINE NASA RULE ENGINE";
-          const s = scenarioPresets[telemetry.scenario];
-          displayDiagnosis(s.diagTitle, s.color, s.standard, s.action, s.rx);
-        }, 300);
-      }
-
-      setTimeout(() => {
-        evalBtn.innerText = "Run NASA Standard Clinical Diagnosis";
-        evalBtn.disabled = false;
-      }, 500);
-    }
-
-    // -----------------------------------------------------------------
-    // 5. LIVE CHART SETUP (CHART.JS)
-    // -----------------------------------------------------------------
-    let trendChart;
-    const historyHR = Array(15).fill(72);
-    const historyCO2 = Array(15).fill(1.8);
-
-    function initChart() {
-      const ctx = document.getElementById('simpleTrendChart').getContext('2d');
-      trendChart = new Chart(ctx, {
+      return new Chart(ctx, {
         type: 'line',
         data: {
-          labels: Array(15).fill(''),
-          datasets: [
-            {
-              label: 'Heart Rate (BPM)',
-              data: historyHR,
-              borderColor: '#f43f5e',
-              borderWidth: 2,
-              tension: 0.3,
-              pointRadius: 0
-            },
-            {
-              label: 'Cabin CO2 (mmHg)',
-              data: historyCO2,
-              borderColor: '#38bdf8',
-              borderWidth: 2,
-              tension: 0.3,
-              pointRadius: 0
-            }
-          ]
+          labels: [],
+          datasets: [{
+            data: [],
+            borderColor: color,
+            borderWidth: 2,
+            backgroundColor: gradient,
+            fill: true,
+            tension: 0.45,
+            cubicInterpolationMode: 'monotone',
+            pointRadius: 0,
+            pointHoverRadius: 4
+          }]
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          animation: { duration: 200 },
+          animation: false,
           scales: {
             x: { display: false },
-            y: { grid: { color: 'rgba(51, 65, 85, 0.3)' }, ticks: { color: '#94a3b8', font: { family: 'Poppins', size: 10 } } }
+            y: {
+              min: yMin,
+              max: yMax,
+              grid: { color: '#131b2e', drawBorder: false },
+              ticks: { color: '#64748b', font: { size: 10, family: 'Poppins' } }
+            }
           },
           plugins: {
-            legend: { labels: { color: '#94a3b8', font: { family: 'Poppins', size: 11 } } }
+            legend: { display: false },
+            tooltip: { enabled: true }
           }
         }
       });
     }
 
-    // Add slight natural jitter to the waveform every second
-    function tickChart() {
-      if (!trendChart) return;
-      const jitterHR = telemetry.hr + (Math.random() * 2 - 1);
-      const jitterCO2 = Math.max(0.5, telemetry.co2 + (Math.random() * 0.1 - 0.05));
+    const chartHR = createSmoothChart('chartHR', '#ec4899', 40, 180);
+    const chartSpO2 = createSmoothChart('chartSpO2', '#38bdf8', 75, 102);
+    const chartPressure = createSmoothChart('chartPressure', '#eab308', 60, 120);
+    const chartCO2 = createSmoothChart('chartCO2', '#a855f7', 0, 7);
 
-      historyHR.shift();
-      historyHR.push(jitterHR.toFixed(1));
+    // --- 3. Telemetry Streamer & Processing ---
+    function updateSystem(vitals) {
+      document.getElementById('valHR').innerText = vitals.hr;
+      document.getElementById('valSpO2').innerText = vitals.spo2 + '%';
+      document.getElementById('valPressure').innerText = vitals.pressure;
+      document.getElementById('valCO2').innerText = vitals.co2;
 
-      historyCO2.shift();
-      historyCO2.push(jitterCO2.toFixed(2));
+      const now = '';
+      [
+        { chart: chartHR, val: vitals.hr },
+        { chart: chartSpO2, val: vitals.spo2 },
+        { chart: chartPressure, val: vitals.pressure },
+        { chart: chartCO2, val: vitals.co2 }
+      ].forEach(item => {
+        if (item.chart.data.labels.length > 25) {
+          item.chart.data.labels.shift();
+          item.chart.data.datasets[0].data.shift();
+        }
+        item.chart.data.labels.push(now);
+        item.chart.data.datasets[0].data.push(item.val);
+        item.chart.update('none');
+      });
 
-      trendChart.update();
+      evaluateClinicalState(vitals);
+      saveLog(vitals);
     }
 
-    // -----------------------------------------------------------------
-    // 6. MARS COMM LATENCY SIMULATOR
-    // -----------------------------------------------------------------
-    let latencySeconds = 862; // ~14 mins 22 secs
-    function tickLatency() {
-      const m = Math.floor(latencySeconds / 60);
-      const s = latencySeconds % 60;
-      document.getElementById('latencyDisplay').innerText = `${m}m ${s < 10 ? '0' : ''}${s}s`;
-      latencySeconds--;
-      if (latencySeconds < 840) latencySeconds = 862;
-    }
+    // --- 4. NASA Clinical Rules & Anomaly Alerting + Actuator Recommendation ---
+    function evaluateClinicalState(v) {
+      const topBanner = document.getElementById('emergencyTopBanner');
+      const actionBox = document.getElementById('actionDirectiveBox');
+      const diagTitle = document.getElementById('diagTitle');
+      const diagDetails = document.getElementById('diagDetails');
+      const actionHead = document.getElementById('actionHeading');
+      const actionDesc = document.getElementById('actionDescription');
 
-    // -----------------------------------------------------------------
-    // 7. GEMINI API KEY MODAL LOGIC
-    // -----------------------------------------------------------------
-    function openApiModal() {
-      document.getElementById('apiModal').classList.remove('hidden');
-      const saved = localStorage.getItem('victorious_gemini_key');
-      if (saved) document.getElementById('apiKeyInput').value = saved;
-    }
+      // Clear previous alerts
+      topBanner.style.display = 'none';
+      actionBox.classList.remove('action-blink');
+      document.querySelectorAll('.metric-card').forEach(c => c.classList.remove('alert-border'));
+      document.querySelectorAll('.actuator-card').forEach(c => c.classList.remove('urgent-target'));
 
-    function closeApiModal() {
-      document.getElementById('apiModal').classList.add('hidden');
-    }
+      // Check Hypercapnia (High CO2)
+      if (v.co2 >= 3.5) {
+        document.getElementById('cardCO2').classList.add('alert-border');
+        document.getElementById('cardHR').classList.add('alert-border');
+        
+        topBanner.style.display = 'block';
+        document.getElementById('bannerDiagnosisText').innerText = `ACUTE HYPERCAPNIA (${v.co2} mmHg)`;
+        document.getElementById('bannerActionText').innerText = 'ENGAGE SECONDARY SCRUBBER FROM CUFF';
 
-    function saveApiKey() {
-      const key = document.getElementById('apiKeyInput').value.trim();
-      if (key) {
-        localStorage.setItem('victorious_gemini_key', key);
-        document.getElementById('apiKeyBtn').innerText = "Gemini API: Connected";
-        document.getElementById('apiKeyBtn').className = "px-3 py-1.5 rounded-lg bg-emerald-900/80 border border-emerald-500/50 text-emerald-200 text-xs font-semibold";
-      } else {
-        clearApiKey();
+        diagTitle.innerText = 'Toxic Hypercapnia Risk (NASA-STD-3001)';
+        diagDetails.innerText = 'ppCO2 levels breach aerospace limits (3.0 mmHg). Cardiac stress reflex detected.';
+        
+        actionHead.innerText = 'URGENT: OVERRIDE LiOH SCRUBBERS';
+        actionDesc.innerText = 'Trigger the blinking "Secondary LiOH Scrubber" actuator on your arm cuff immediately!';
+        actionBox.classList.add('action-blink');
+
+        // Light up the specific actuator button on the cuff
+        const target = document.getElementById('actCardScrubber');
+        target.classList.add('urgent-target');
+        document.getElementById('btnActScrubber').innerText = '⚠ [EXECUTE SCRUBBER]';
+        return;
       }
-      closeApiModal();
-    }
 
-    function clearApiKey() {
-      localStorage.removeItem('victorious_gemini_key');
-      document.getElementById('apiKeyInput').value = '';
-      document.getElementById('apiKeyBtn').innerText = "Set Gemini API Key";
-      document.getElementById('apiKeyBtn').className = "px-3 py-1.5 rounded-lg bg-indigo-900/80 hover:bg-indigo-800 border border-indigo-500/40 text-indigo-200 transition font-medium text-xs";
-      closeApiModal();
-    }
+      // Check Suit Micro-Decompression
+      if (v.pressure < 92.0 || v.spo2 < 93) {
+        document.getElementById('cardPressure').classList.add('alert-border');
+        document.getElementById('cardSpO2').classList.add('alert-border');
 
-    // -----------------------------------------------------------------
-    // 8. ON WINDOW LOAD
-    // -----------------------------------------------------------------
-    window.onload = function() {
-      initChart();
-      loadScenario('nominal');
+        topBanner.style.display = 'block';
+        document.getElementById('bannerDiagnosisText').innerText = 'SUIT DECOMPRESSION DETECTED';
+        document.getElementById('bannerActionText').innerText = 'DEPLOY SUIT PRESSURE SEAL & O2 PURGE';
+
+        diagTitle.innerText = 'Hypobaric Decompression Alert';
+        diagDetails.innerText = 'Suit pressure dropped below safe threshold (97.0 kPa). Early arterial hypoxia risk.';
+
+        actionHead.innerText = 'CRITICAL: SEAL COMPARTMENT & PURGE';
+        actionDesc.innerText = 'Press the blinking "IVA Seal & O2 Purge" actuator on your cuff to arrest pressure drop.';
+        actionBox.classList.add('action-blink');
+
+        const target = document.getElementById('actCardPressure');
+        target.classList.add('urgent-target');
+        document.getElementById('btnActPressure').innerText = '⚠ [DEPLOY SEAL]';
+        return;
+      }
+
+      // Check Heavy Physical Exertion (EVA Strain)
+      if (v.hr > 125) {
+        document.getElementById('cardHR').classList.add('alert-border');
+
+        diagTitle.innerText = 'Elevated Metabolic Exertion (EVA Strain)';
+        diagDetails.innerText = 'High pulse under nominal pressure. Thermal regulation load increasing.';
+
+        actionHead.innerText = 'ADVISORY: BOOST LIQUID COOLING (LCG)';
+        actionDesc.innerText = 'Press the "Liquid Cooling Garment" actuator button to dissipate metabolic core heat.';
+
+        const target = document.getElementById('actCardCooling');
+        target.classList.add('urgent-target');
+        document.getElementById('btnActCooling').innerText = '⚠ [BOOST COOLING]';
+        return;
+      }
+
+      // Nominal Baseline
+      diagTitle.innerText = 'Nominal Flight Status';
+      diagDetails.innerText = 'All physiological and atmospheric variables reside within established NASA-STD-3001 limits.';
+      actionHead.innerText = 'Routine Operations';
+      actionDesc.innerText = 'No intervention required. Suit life-support loops operating autonomously.';
       
-      const savedKey = localStorage.getItem('victorious_gemini_key');
-      if (savedKey) {
-        document.getElementById('apiKeyBtn').innerText = "Gemini API: Connected";
-        document.getElementById('apiKeyBtn').className = "px-3 py-1.5 rounded-lg bg-emerald-950 border border-emerald-500/50 text-emerald-200 text-xs font-semibold";
+      // Reset button texts
+      document.getElementById('btnActScrubber').innerText = 'Engage Scrubber';
+      document.getElementById('btnActPressure').innerText = 'Deploy Suit Seal';
+      document.getElementById('btnActCooling').innerText = 'Boost Cooling Loop';
+      document.getElementById('btnActMed').innerText = 'Authorize Injector';
+    }
+
+    // --- 5. Interactive Actuator Execution (Controllable from the Site!) ---
+    async function executeActuator(type, message) {
+      // Audio feedback (synthesized beep)
+      playBeepAudio();
+
+      const toast = document.getElementById('actuatorToast');
+      toast.innerText = `COMMAND SENT: ${message} (Transmitted to Suit Relay)`;
+      toast.classList.add('active-cmd');
+
+      // Send Serial command if hardware is connected!
+      if (serialWriter) {
+        try {
+          const encoder = new TextEncoder();
+          await serialWriter.write(encoder.encode(`CMD:${type}\n`));
+          console.log(`Command transmitted to ESP32: CMD:${type}`);
+        } catch (e) {
+          console.error('Serial Write Error:', e);
+        }
       }
 
-      // Start real-time graph and latency timer loops
-      setInterval(tickChart, 1000);
-      setInterval(tickLatency, 1000);
-    };
-  </script>
+      // Record actuator event in audit log
+      logCache.unshift({
+        timestamp: new Date().toLocaleTimeString(),
+        crew_name: activeCrewName,
+        actuator_executed: type,
+        status: message
+      });
+      localStorage.setItem('astraea_logs', JSON.stringify(logCache));
 
+      // Visual Countermeasure: Restore vitals back to normal after action is taken!
+      setTimeout(() => {
+        toast.innerText = `STATUS: Countermeasure active. Normalizing telemetry.`;
+        setScenario('nominal');
+      }, 1800);
+    }
+
+    function playBeepAudio() {
+      try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(880, audioCtx.currentTime); // 880Hz A5 note
+        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.15);
+      } catch (e) {}
+    }
+
+    // --- 6. Bidirectional Web Serial API (ESP32 Integration) ---
+    async function toggleWebSerial() {
+      closeAllDropdowns();
+
+      const btn = document.getElementById('btnHardwareSerial');
+      const text = document.getElementById('hardwareBtnText');
+      const toast = document.getElementById('actuatorToast');
+
+      if (serialPort || isSerialEmulated) {
+        // Disconnect
+        disconnectSerial();
+        return;
+      }
+
+      // Check if Web Serial is available in this browser
+      if (!('serial' in navigator)) {
+        fallbackToSimulatedHardware('Web Serial not supported in this browser. Running ESP32 Bio-Cuff emulation mode.');
+        return;
+      }
+
+      try {
+        serialPort = await navigator.serial.requestPort();
+        await serialPort.open({ baudRate: 115200 });
+        clearInterval(telemetryInterval);
+
+        btn.classList.add('connected');
+        text.innerText = 'ESP32 Bio-Cuff Connected (USB)';
+        toast.innerText = 'STATUS: ESP32 hardware serial connection established.';
+        toast.className = 'actuator-status-toast active-cmd';
+
+        // Writer for bidirectional control
+        const textEncoder = new TextEncoderStream();
+        const writableStreamClosed = textEncoder.readable.pipeTo(serialPort.writable);
+        serialWriter = textEncoder.writable.getWriter();
+
+        // Reader for incoming telemetry
+        const decoder = new TextDecoderStream();
+        const readableStreamClosed = serialPort.readable.pipeTo(decoder.writable);
+        serialReader = decoder.readable.getReader();
+
+        let lineBuffer = '';
+        while (true) {
+          const { value, done } = await serialReader.read();
+          if (done) break;
+          lineBuffer += value;
+          const lines = lineBuffer.split('\n');
+          lineBuffer = lines.pop();
+
+          for (const line of lines) {
+            const parts = line.trim().split(',');
+            if (parts.length === 4) {
+              const [hr, spo2, press, co2] = parts.map(Number);
+              if (!isNaN(hr) && !isNaN(spo2)) {
+                updateSystem({ hr, spo2, pressure: press, co2 });
+              }
+            }
+          }
+        }
+      } catch (err) {
+        // Intercept Permissions-Policy sandbox restrictions or user cancellation
+        console.warn('Web Serial Port Access notice:', err.message);
+        fallbackToSimulatedHardware('Sandbox iFrame restricted USB access. Running Live ESP32 Stream Simulation.');
+      }
+    }
+
+    let isSerialEmulated = false;
+    function fallbackToSimulatedHardware(noticeMsg) {
+      clearInterval(telemetryInterval);
+      isSerialEmulated = true;
+      const btn = document.getElementById('btnHardwareSerial');
+      const text = document.getElementById('hardwareBtnText');
+      const toast = document.getElementById('actuatorToast');
+
+      btn.classList.add('connected');
+      text.innerText = 'ESP32 Bio-Cuff (Emulated)';
+      toast.innerText = `STATUS: ${noticeMsg}`;
+      toast.className = 'actuator-status-toast active-cmd';
+
+      // Stream realistic live hardware pulse telemetry
+      let serialPhase = 0;
+      telemetryInterval = setInterval(() => {
+        serialPhase += 0.35;
+        updateSystem({
+          hr: Math.round(76 + Math.sin(serialPhase) * 4),
+          spo2: Math.min(100, Math.round(98 + Math.cos(serialPhase * 0.5) * 1)),
+          pressure: +(101.2 + Math.sin(serialPhase * 0.4) * 0.3).toFixed(1),
+          co2: +(1.25 + Math.cos(serialPhase * 0.6) * 0.1).toFixed(2)
+        });
+      }, 1000);
+    }
+
+    function disconnectSerial() {
+      isSerialEmulated = false;
+      if (serialReader) {
+        serialReader.cancel().catch(() => {});
+        serialReader = null;
+      }
+      if (serialWriter) {
+        serialWriter.close().catch(() => {});
+        serialWriter = null;
+      }
+      if (serialPort) {
+        serialPort.close().catch(() => {});
+        serialPort = null;
+      }
+      const btn = document.getElementById('btnHardwareSerial');
+      btn.classList.remove('connected');
+      document.getElementById('hardwareBtnText').innerText = 'Connect Suit ESP32';
+      const toast = document.getElementById('actuatorToast');
+      toast.innerText = 'STATUS: Suit hardware disconnected. System in standby.';
+      toast.className = 'actuator-status-toast';
+      clearTelemetry();
+    }
+
+    // --- 7. Simulator Presets ---
+    function setScenario(type) {
+      closeAllDropdowns();
+      clearInterval(telemetryInterval);
+
+      const presets = {
+        nominal: { hr: 72, spo2: 98, pressure: 101.3, co2: 1.2, amp: 2 },
+        hypercapnia: { hr: 114, spo2: 94, pressure: 100.8, co2: 4.2, amp: 4 },
+        decompression: { hr: 122, spo2: 89, pressure: 84.5, co2: 1.1, amp: 3 },
+        eva: { hr: 138, spo2: 97, pressure: 101.1, co2: 1.8, amp: 5 }
+      };
+
+      const base = presets[type];
+
+      telemetryInterval = setInterval(() => {
+        phase += 0.35;
+        const wave = Math.sin(phase);
+        const subwave = Math.cos(phase * 0.7);
+
+        updateSystem({
+          hr: Math.round(base.hr + wave * base.amp),
+          spo2: Math.min(100, Math.round(base.spo2 + (wave * 0.5))),
+          pressure: +(base.pressure + subwave * 0.3).toFixed(1),
+          co2: +(base.co2 + wave * 0.15).toFixed(2)
+        });
+      }, 700);
+    }
+
+    function clearTelemetry() {
+      closeAllDropdowns();
+      clearInterval(telemetryInterval);
+
+      document.getElementById('valHR').innerText = '--';
+      document.getElementById('valSpO2').innerText = '--';
+      document.getElementById('valPressure').innerText = '--';
+      document.getElementById('valCO2').innerText = '--';
+
+      [chartHR, chartSpO2, chartPressure, chartCO2].forEach(c => {
+        c.data.labels = [];
+        c.data.datasets[0].data = [];
+        c.update('none');
+      });
+
+      document.getElementById('emergencyTopBanner').style.display = 'none';
+      document.getElementById('actionDirectiveBox').classList.remove('action-blink');
+      document.querySelectorAll('.metric-card').forEach(c => c.classList.remove('alert-border'));
+      document.querySelectorAll('.actuator-card').forEach(c => c.classList.remove('urgent-target'));
+
+      document.getElementById('diagTitle').innerText = 'Awaiting Telemetry Feed';
+      document.getElementById('diagDetails').innerText = 'Wrist HUD in standby. Connect suit ESP32 or select a simulator scenario.';
+      document.getElementById('actionHeading').innerText = 'Standby State';
+      document.getElementById('actionDescription').innerText = 'No emergency detected. Awaiting telemetry stream.';
+      document.getElementById('actuatorToast').innerText = 'Awaiting telemetry trigger...';
+      document.getElementById('actuatorToast').classList.remove('active-cmd');
+    }
+
+    // --- 8. LocalStorage Logs & Drawer Control ---
+    function saveLog(v) {
+      logCache.unshift({
+        timestamp: new Date().toLocaleTimeString(),
+        crew_name: activeCrewName,
+        ...v
+      });
+      if (logCache.length > 35) logCache.pop();
+      localStorage.setItem('astraea_logs', JSON.stringify(logCache));
+      if (document.getElementById('storageDrawer').classList.contains('open')) {
+        renderStorageLogs();
+      }
+    }
+
+    function renderStorageLogs() {
+      const display = document.getElementById('storageLogDisplay');
+      display.innerText = logCache.length ? JSON.stringify(logCache, null, 2) : 'No entries stored.';
+    }
+
+    function openStorageDrawer() {
+      closeAllDropdowns();
+      document.getElementById('storageDrawer').classList.add('open');
+      document.getElementById('drawerBackdrop').classList.add('show');
+      renderStorageLogs();
+    }
+
+    function closeStorageDrawer() {
+      document.getElementById('storageDrawer').classList.remove('open');
+      document.getElementById('drawerBackdrop').classList.remove('show');
+    }
+
+    function clearStoredLogs() {
+      logCache = [];
+      localStorage.removeItem('astraea_logs');
+      renderStorageLogs();
+    }
+
+    function exportStoredLogs() {
+      const blob = new Blob([JSON.stringify(logCache, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `astraea_cuff_logs_${Date.now()}.json`;
+      a.click();
+    }
+
+    // --- 9. Dropdown Helper & Shortcuts ---
+    function toggleDropdown(e) {
+      e.stopPropagation();
+      document.getElementById('simDropdown').classList.toggle('active');
+    }
+
+    function closeAllDropdowns() {
+      document.getElementById('simDropdown').classList.remove('active');
+    }
+
+    window.addEventListener('click', function(e) {
+      if (!e.target.closest('#simDropdown')) {
+        closeAllDropdowns();
+      }
+    });
+
+    window.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeStorageDrawer();
+        closeAllDropdowns();
+      }
+    });
+  </script>
 </body>
 </html>
