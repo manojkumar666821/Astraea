@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Astraea - Team Victorious | NASA Space Apps Challenge 2026</title>
+  
+  <!-- Tailwind CSS for clean layout and styling -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Chart.js for simple biometrics graphing -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Google Font: Poppins (Clean, readable modern typography) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* Apply Poppins font to the entire document */
+    body, * {
+      font-family: 'Poppins', sans-serif;
+    }
+
+    /* Subtle custom card styling for the dark aerospace console */
+    .space-card {
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(56, 189, 248, 0.15);
+      border-radius: 1rem;
+      transition: all 0.2s ease-in-out;
+    }
+    
+    .space-card:hover {
+      border-color: rgba(56, 189, 248, 0.35);
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between">
+
+  <!-- ============================================================
+       TOP NAVIGATION BAR (TEAM VICTORIOUS + MISSION IDENTIFICATION)
+       ============================================================ -->
+  <header class="border-b border-slate-800 bg-slate-900/90 sticky top-0 z-30 px-4 py-3 sm:px-6">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+      
+      <!-- Brand & Team Banner -->
+      <div class="flex items-center gap-3">
+        <!-- <span class="px-3 py-1 rounded-full text-xs font-bold tracking-wider bg-gradient-to-r from-sky-500 to-indigo-600 text-white shadow-md shadow-sky-500/20">
+          TEAM VICTORIOUS
+        </span> -->
+        <span class="text-slate-500 hidden sm:inline">|</span>
+        <span class="text-sm font-semibold tracking-wide text-sky-400">
+          Astraea <span class="text-xs text-slate-400 font-normal">Autonomous Health Officer</span>
+        </span>
+      </div>
+
+      <!-- Mars Orbital Latency & Gemini API Button -->
+      <div class="flex items-center gap-3 text-xs">
+        <!-- Mars-Earth Comm Delay Counter -->
+        <div class="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-lg bg-slate-800 border border-slate-700 text-slate-300">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span>Earth Delay:</span>
+          <strong id="latencyDisplay" class="text-sky-300">14m 22s</strong>
+        </div>
+
+        <!-- API Key Config Button -->
+        <button onclick="openApiModal()" id="apiKeyBtn" class="px-3 py-1.5 rounded-lg bg-indigo-900/80 hover:bg-indigo-800 border border-indigo-500/40 text-indigo-200 transition font-medium">
+          Set Gemini API Key
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ============================================================
+       MAIN CONTENT CONTAINER
+       ============================================================ -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 py-6 w-full space-y-6">
+
+    <!-- Mission Header & Quick Overview -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-slate-800/80 pb-4">
+      <div>
+        <h1 class="text-2xl sm:text-3xl font-bold text-white tracking-tight">
+          Crew Health &amp; Cabin Monitoring
+        </h1>
+        <p class="text-xs sm:text-sm text-slate-400 mt-1">
+          Deep-space telemetry cross-correlation compliant with <span class="text-sky-400 font-medium">NASA-STD-3001</span> aerospace limits.
+        </p>
+      </div>
+
+      <!-- Quick Badges -->
+      <div class="flex items-center gap-2">
+        <span class="text-[11px] px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-700 text-slate-300">
+          Mission: <strong>Ares Mars Transit</strong>
+        </span>
+        <span class="text-[11px] px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-700 text-slate-300">
+          Crew: <strong>Cmdr. Alex Vance</strong>
+        </span>
+      </div>
+    </div>
+
+    <!-- ============================================================
+         SCENARIO SWITCHER (PRESETS FOR VIDEO RECORDING & DEMO)
+         ============================================================ -->
+    <div class="space-card p-4">
+      <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
+        <span class="text-xs font-semibold text-slate-300 uppercase tracking-wider">
+          Select Simulated Mission Scenario:
+        </span>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 w-full md:w-auto">
+          <button onclick="loadScenario('nominal')" id="btn-nominal" class="scenario-btn px-3 py-2 rounded-lg text-xs font-semibold bg-sky-600 text-white shadow-md border border-sky-400 transition">
+            1. Normal Flight
+          </button>
+          <button onclick="loadScenario('hypercapnia')" id="btn-hypercapnia" class="scenario-btn px-3 py-2 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700 transition">
+            2. CO2 Spike
+          </button>
+          <button onclick="loadScenario('decompression')" id="btn-decompression" class="scenario-btn px-3 py-2 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700 transition">
+            3. Decompression
+          </button>
+          <button onclick="loadScenario('spacewalk')" id="btn-spacewalk" class="scenario-btn px-3 py-2 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700 transition">
+            4. EVA Spacewalk
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================
+         TELEMETRY METRICS GRID (5 CARDS)
+         ============================================================ -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
+      
+      <!-- Card 1: Heart Rate -->
+      <div class="space-card p-4 flex flex-col justify-between">
+        <span class="text-xs text-slate-400 font-medium">Heart Rate</span>
+        <div class="my-2">
+          <span id="metric-hr" class="text-2xl sm:text-3xl font-bold text-white">72</span>
+          <span class="text-xs text-slate-400 ml-1">BPM</span>
+        </div>
+        <span class="text-[11px] text-slate-500">Nominal: 60-100</span>
+      </div>
+
+      <!-- Card 2: SpO2 -->
+      <div class="space-card p-4 flex flex-col justify-between">
+        <span class="text-xs text-slate-400 font-medium">Blood Oxygen (SpO2)</span>
+        <div class="my-2">
+          <span id="metric-spo2" class="text-2xl sm:text-3xl font-bold text-white">98</span>
+          <span class="text-xs text-slate-400 ml-1">%</span>
+        </div>
+        <span class="text-[11px] text-slate-500">Nominal: &ge; 95%</span>
+      </div>
+
+      <!-- Card 3: Cabin CO2 -->
+      <div class="space-card p-4 flex flex-col justify-between">
+        <span class="text-xs text-slate-400 font-medium">Cabin ppCO2</span>
+        <div class="my-2">
+          <span id="metric-co2" class="text-2xl sm:text-3xl font-bold text-white">1.8</span>
+          <span class="text-xs text-slate-400 ml-1">mmHg</span>
+        </div>
+        <span class="text-[11px] text-slate-500">Limit: &le; 3.0 mmHg</span>
+      </div>
+
+      <!-- Card 4: Cabin Pressure -->
+      <div class="space-card p-4 flex flex-col justify-between">
+        <span class="text-xs text-slate-400 font-medium">Cabin Pressure</span>
+        <div class="my-2">
+          <span id="metric-press" class="text-2xl sm:text-3xl font-bold text-white">101.3</span>
+          <span class="text-xs text-slate-400 ml-1">kPa</span>
+        </div>
+        <span class="text-[11px] text-slate-500">Nominal: 97-103</span>
+      </div>
+
+      <!-- Card 5: Core Temperature -->
+      <div class="space-card p-4 flex flex-col justify-between col-span-2 sm:col-span-1">
+        <span class="text-xs text-slate-400 font-medium">Core Temp</span>
+        <div class="my-2">
+          <span id="metric-temp" class="text-2xl sm:text-3xl font-bold text-white">36.8</span>
+          <span class="text-xs text-slate-400 ml-1">&deg;C</span>
+        </div>
+        <span class="text-[11px] text-slate-500">Nominal: 36.5-37.5</span>
+      </div>
+
+    </div>
+
+    <!-- ============================================================
+         LOWER GRID: VITAL CHART (LEFT) & CLINICAL DECISION BOX (RIGHT)
+         ============================================================ -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+      <!-- LEFT: Simple Live Chart (7 Cols) -->
+      <div class="lg:col-span-7 space-card p-5 flex flex-col justify-between">
+        <div class="flex items-center justify-between mb-3 border-b border-slate-800 pb-2">
+          <h2 class="text-sm font-semibold text-white">Live Telemetry Trend Waveform</h2>
+          <span class="text-xs text-slate-400">1.0 Hz Real-Time Loop</span>
+        </div>
+        <div class="h-56 w-full">
+          <canvas id="simpleTrendChart"></canvas>
+        </div>
+      </div>
+
+      <!-- RIGHT: Autonomous Clinical Decision Support (5 Cols) -->
+      <div class="lg:col-span-5 space-card p-5 space-y-4 border-indigo-500/30">
+        
+        <!-- Header & Action Button -->
+        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-indigo-400 animate-ping"></span>
+            <h2 class="text-sm font-bold text-white">Autonomous Decision Officer</h2>
+          </div>
+          <span id="engineBadge" class="text-[10px] px-2 py-0.5 rounded bg-indigo-950 text-indigo-300 border border-indigo-500/30 font-medium">
+            OFFLINE RULE ENGINE
+          </span>
+        </div>
+
+        <!-- Evaluation Trigger Button -->
+        <button onclick="evaluateHealthCondition()" id="evalBtn" class="w-full py-2.5 px-4 rounded-xl text-xs font-semibold text-white bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 transition shadow-lg shadow-indigo-900/40">
+          Run NASA Standard Clinical Diagnosis
+        </button>
+
+        <!-- Diagnosis Display Card -->
+        <div class="bg-slate-900/90 p-4 rounded-xl border border-slate-800 space-y-3 text-xs">
+          
+          <!-- Diagnosis Name -->
+          <div>
+            <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block">Primary Diagnosis</span>
+            <p id="diagTitle" class="text-sm font-bold text-emerald-400 mt-0.5">
+              Normal Physiological Baseline
+            </p>
+          </div>
+
+          <!-- NASA Standard Violated -->
+          <div>
+            <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block">NASA Standards Status</span>
+            <p id="diagStandard" class="text-slate-300 mt-0.5">
+              NASA-STD-3001: All vitals within compliant safe boundaries.
+            </p>
+          </div>
+
+          <!-- Immediate Action Protocol -->
+          <div>
+            <span class="text-[10px] font-semibold text-amber-400 uppercase tracking-wider block">Immediate Action Protocol</span>
+            <p id="diagAction" class="text-slate-300 mt-0.5">
+              Continue regular flight roster. Maintain standard 2.5L daily hydration.
+            </p>
+          </div>
+
+          <!-- Medical Kit Prescription -->
+          <div>
+            <span class="text-[10px] font-semibold text-purple-400 uppercase tracking-wider block">Spaceflight Medical Kit</span>
+            <p id="diagRx" class="text-slate-300 mt-0.5">
+              None required. Routine multivitamin supplement.
+            </p>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- ============================================================
+       MODAL: GEMINI API KEY SETUP
+       ============================================================ -->
+  <div id="apiModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-slate-900 border border-slate-700 p-6 rounded-2xl max-w-md w-full space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="text-sm font-bold text-white">Setup Gemini API Key</h3>
+        <button onclick="closeApiModal()" class="text-slate-400 hover:text-white text-lg">&times;</button>
+      </div>
+
+      <p class="text-xs text-slate-300 leading-relaxed">
+        Paste your free Gemini API key from 
+        <a href="https://aistudio.google.com" target="_blank" class="text-sky-400 underline font-medium">Google AI Studio</a>. 
+        If you don't enter one, the app works 100% offline using standard built-in rules!
+      </p>
+
+      <input type="password" id="apiKeyInput" placeholder="Paste AIzaSy... key here" class="w-full px-3 py-2 rounded-lg bg-slate-950 border border-slate-700 text-xs text-white focus:outline-none focus:border-sky-500">
+
+      <div class="flex items-center justify-end gap-2 pt-2">
+        <button onclick="clearApiKey()" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-rose-400 hover:bg-rose-950/40">Clear</button>
+        <button onclick="saveApiKey()" class="px-4 py-1.5 rounded-lg text-xs font-semibold bg-sky-600 hover:bg-sky-500 text-white">Save Key</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       FOOTER: PROMINENT TEAM VICTORIOUS CREDITS & CITATIONS
+       ============================================================ -->
+  <footer class="border-t border-slate-800 bg-slate-900/80 px-4 py-6 mt-8 text-center text-xs text-slate-400 space-y-2">
+    <p class="text-sm font-bold text-slate-200 tracking-wide">
+      Developed with pride by <span class="text-sky-400">TEAM VICTORIOUS</span> | NASA Space Apps Challenge 2026
+    </p>
+    <p class="text-[11px] text-slate-500">
+      Universal Event (Virtual Track) &bull; Designed for Deep-Space Astronaut Clinical Support
+    </p>
+    <div class="flex flex-wrap items-center justify-center gap-3 pt-1 text-[11px] text-slate-400">
+      <span>Data Standard: <strong class="text-slate-300">NASA-STD-3001 (Vol 1 &amp; 2)</strong></span>
+      <span>&bull;</span>
+      <span>Baseline Archive: <strong class="text-slate-300">NASA Life Sciences Data Archive (LSDA)</strong></span>
+    </div>
+  </footer>
+
+  <!-- ============================================================
+       JAVASCRIPT: CLEAN, PLAIN, AND EASY-TO-UNDERSTAND CODE
+       ============================================================ -->
+  <script>
+    // -----------------------------------------------------------------
+    // 1. SIMPLE STATE: Holds current telemetry values
+    // -----------------------------------------------------------------
+    let telemetry = {
+      hr: 72,         // Heart Rate (BPM)
+      spo2: 98,       // Blood Oxygen (%)
+      co2: 1.8,       // Cabin CO2 (mmHg)
+      press: 101.3,   // Cabin Pressure (kPa)
+      temp: 36.8,     // Core Temperature (°C)
+      scenario: 'nominal'
+    };
+
+    // -----------------------------------------------------------------
+    // 2. PRESET SCENARIOS FOR EASY DEMO SWITCHING
+    // -----------------------------------------------------------------
+    const scenarioPresets = {
+      nominal: {
+        hr: 72, spo2: 98, co2: 1.8, press: 101.3, temp: 36.8,
+        diagTitle: "Normal Physiological Baseline",
+        color: "text-emerald-400",
+        standard: "NASA-STD-3001: All vitals within compliant safe boundaries.",
+        action: "Continue regular flight roster. Maintain standard 2.5L daily hydration.",
+        rx: "None required. Routine multivitamin supplement."
+      },
+      hypercapnia: {
+        hr: 110, spo2: 93, co2: 5.6, press: 101.1, temp: 37.1,
+        diagTitle: "Acute Hypercapnia (CO2 Poisoning)",
+        color: "text-rose-400",
+        standard: "VIOLATION: Cabin ppCO2 (5.6 mmHg) exceeds NASA-STD-3001 threshold (<= 3.0 mmHg).",
+        action: "Don Quick-Don emergency oxygen mask immediately. Switch ECLSS to backup Amine Scrubber Bed B.",
+        rx: "Administer Ibuprofen 400mg PO for CO2-induced vascular headache."
+      },
+      decompression: {
+        hr: 125, spo2: 88, co2: 1.2, press: 69.2, temp: 36.2,
+        diagTitle: "Cabin Micro-Decompression Hazard",
+        color: "text-rose-400",
+        standard: "CRITICAL: Cabin Pressure (69.2 kPa) fell below safety limit of 70.3 kPa (NASA-STD-3001).",
+        action: "Evacuate to Safe Haven Module Node-2 and seal emergency pressure bulkhead hatch.",
+        rx: "100% High-Flow O2 pre-breathe protocol to prevent tissue nitrogen bubble formation (DCS)."
+      },
+      spacewalk: {
+        hr: 138, spo2: 96, co2: 2.3, press: 100.9, temp: 38.2,
+        diagTitle: "Exertional Heat Exhaustion (EVA Strain)",
+        color: "text-amber-400",
+        standard: "VIOLATION: Core temperature (38.2°C) exceeds thermal limit (NASA-STD-3001 Vol 1).",
+        action: "Cease manual EVA tasks for 15 minutes. Increase spacesuit Liquid Cooling Garment (LCVG) flow to maximum.",
+        rx: "Ingest 500 mL electrolyte hydration drink via helmet in-suit drink bag."
+      }
+    };
+
+    // -----------------------------------------------------------------
+    // 3. LOAD SCENARIO FUNCTION: Triggered when scenario button is clicked
+    // -----------------------------------------------------------------
+    function loadScenario(name) {
+      telemetry.scenario = name;
+      const s = scenarioPresets[name];
+
+      // Update telemetry state
+      telemetry.hr = s.hr;
+      telemetry.spo2 = s.spo2;
+      telemetry.co2 = s.co2;
+      telemetry.press = s.press;
+      telemetry.temp = s.temp;
+
+      // Update screen text
+      document.getElementById('metric-hr').innerText = s.hr;
+      document.getElementById('metric-spo2').innerText = s.spo2;
+      document.getElementById('metric-co2').innerText = s.co2;
+      document.getElementById('metric-press').innerText = s.press;
+      document.getElementById('metric-temp').innerText = s.temp;
+
+      // Update button colors
+      document.querySelectorAll('.scenario-btn').forEach(btn => {
+        btn.className = "scenario-btn px-3 py-2 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700 transition";
+      });
+      document.getElementById(`btn-${name}`).className = "scenario-btn px-3 py-2 rounded-lg text-xs font-semibold bg-sky-600 text-white shadow-md border border-sky-400 transition";
+
+      // Instantly run the diagnosis
+      displayDiagnosis(s.diagTitle, s.color, s.standard, s.action, s.rx);
+    }
+
+    // Helper to display diagnosis result
+    function displayDiagnosis(title, colorClass, standard, action, rx) {
+      const titleEl = document.getElementById('diagTitle');
+      titleEl.innerText = title;
+      titleEl.className = `text-sm font-bold ${colorClass} mt-0.5`;
+
+      document.getElementById('diagStandard').innerText = standard;
+      document.getElementById('diagAction').innerText = action;
+      document.getElementById('diagRx').innerText = rx;
+    }
+
+    // -----------------------------------------------------------------
+    // 4. CLINICAL DECISION EVALUATOR (DUAL MODE: GEMINI OR OFFLINE RULE)
+    // -----------------------------------------------------------------
+    async function evaluateHealthCondition() {
+      const apiKey = localStorage.getItem('victorious_gemini_key');
+      const evalBtn = document.getElementById('evalBtn');
+      const engineBadge = document.getElementById('engineBadge');
+
+      evalBtn.innerText = "Analyzing Telemetry...";
+      evalBtn.disabled = true;
+
+      // MODE A: If API Key exists, call Google Gemini 1.5 Flash
+      if (apiKey) {
+        try {
+          engineBadge.innerText = "GEMINI-1.5-FLASH (LIVE)";
+          
+          const prompt = `You are a NASA Flight Surgeon analyzing an astronaut's telemetry during deep space transit:
+- Heart Rate: ${telemetry.hr} BPM
+- SpO2: ${telemetry.spo2}%
+- Cabin CO2: ${telemetry.co2} mmHg (NASA-STD-3001 limit <= 3.0)
+- Cabin Pressure: ${telemetry.press} kPa (nominal 97-103)
+- Core Temp: ${telemetry.temp} °C
+Respond ONLY with a JSON object:
+{"title": "diagnosis", "color": "text-rose-400 or text-emerald-400 or text-amber-400", "standard": "violation summary", "action": "immediate action", "rx": "prescription"}`;
+
+          const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+          const res = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+          });
+
+          const data = await res.json();
+          const raw = data.candidates[0].content.parts[0].text;
+          const clean = raw.replace(/```json|```/g, '').trim();
+          const parsed = JSON.parse(clean);
+
+          displayDiagnosis(parsed.title, parsed.color || "text-sky-400", parsed.standard, parsed.action, parsed.rx);
+        } catch (err) {
+          console.warn("Gemini call error. Using offline rule fallback:", err);
+          engineBadge.innerText = "OFFLINE RULE ENGINE (FALLBACK)";
+          const s = scenarioPresets[telemetry.scenario];
+          displayDiagnosis(s.diagTitle, s.color, s.standard, s.action, s.rx);
+        }
+      } else {
+        // MODE B: Offline Deterministic Engine (Zero Failure guarantee)
+        setTimeout(() => {
+          engineBadge.innerText = "OFFLINE NASA RULE ENGINE";
+          const s = scenarioPresets[telemetry.scenario];
+          displayDiagnosis(s.diagTitle, s.color, s.standard, s.action, s.rx);
+        }, 300);
+      }
+
+      setTimeout(() => {
+        evalBtn.innerText = "Run NASA Standard Clinical Diagnosis";
+        evalBtn.disabled = false;
+      }, 500);
+    }
+
+    // -----------------------------------------------------------------
+    // 5. LIVE CHART SETUP (CHART.JS)
+    // -----------------------------------------------------------------
+    let trendChart;
+    const historyHR = Array(15).fill(72);
+    const historyCO2 = Array(15).fill(1.8);
+
+    function initChart() {
+      const ctx = document.getElementById('simpleTrendChart').getContext('2d');
+      trendChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: Array(15).fill(''),
+          datasets: [
+            {
+              label: 'Heart Rate (BPM)',
+              data: historyHR,
+              borderColor: '#f43f5e',
+              borderWidth: 2,
+              tension: 0.3,
+              pointRadius: 0
+            },
+            {
+              label: 'Cabin CO2 (mmHg)',
+              data: historyCO2,
+              borderColor: '#38bdf8',
+              borderWidth: 2,
+              tension: 0.3,
+              pointRadius: 0
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          animation: { duration: 200 },
+          scales: {
+            x: { display: false },
+            y: { grid: { color: 'rgba(51, 65, 85, 0.3)' }, ticks: { color: '#94a3b8', font: { family: 'Poppins', size: 10 } } }
+          },
+          plugins: {
+            legend: { labels: { color: '#94a3b8', font: { family: 'Poppins', size: 11 } } }
+          }
+        }
+      });
+    }
+
+    // Add slight natural jitter to the waveform every second
+    function tickChart() {
+      if (!trendChart) return;
+      const jitterHR = telemetry.hr + (Math.random() * 2 - 1);
+      const jitterCO2 = Math.max(0.5, telemetry.co2 + (Math.random() * 0.1 - 0.05));
+
+      historyHR.shift();
+      historyHR.push(jitterHR.toFixed(1));
+
+      historyCO2.shift();
+      historyCO2.push(jitterCO2.toFixed(2));
+
+      trendChart.update();
+    }
+
+    // -----------------------------------------------------------------
+    // 6. MARS COMM LATENCY SIMULATOR
+    // -----------------------------------------------------------------
+    let latencySeconds = 862; // ~14 mins 22 secs
+    function tickLatency() {
+      const m = Math.floor(latencySeconds / 60);
+      const s = latencySeconds % 60;
+      document.getElementById('latencyDisplay').innerText = `${m}m ${s < 10 ? '0' : ''}${s}s`;
+      latencySeconds--;
+      if (latencySeconds < 840) latencySeconds = 862;
+    }
+
+    // -----------------------------------------------------------------
+    // 7. GEMINI API KEY MODAL LOGIC
+    // -----------------------------------------------------------------
+    function openApiModal() {
+      document.getElementById('apiModal').classList.remove('hidden');
+      const saved = localStorage.getItem('victorious_gemini_key');
+      if (saved) document.getElementById('apiKeyInput').value = saved;
+    }
+
+    function closeApiModal() {
+      document.getElementById('apiModal').classList.add('hidden');
+    }
+
+    function saveApiKey() {
+      const key = document.getElementById('apiKeyInput').value.trim();
+      if (key) {
+        localStorage.setItem('victorious_gemini_key', key);
+        document.getElementById('apiKeyBtn').innerText = "Gemini API: Connected";
+        document.getElementById('apiKeyBtn').className = "px-3 py-1.5 rounded-lg bg-emerald-900/80 border border-emerald-500/50 text-emerald-200 text-xs font-semibold";
+      } else {
+        clearApiKey();
+      }
+      closeApiModal();
+    }
+
+    function clearApiKey() {
+      localStorage.removeItem('victorious_gemini_key');
+      document.getElementById('apiKeyInput').value = '';
+      document.getElementById('apiKeyBtn').innerText = "Set Gemini API Key";
+      document.getElementById('apiKeyBtn').className = "px-3 py-1.5 rounded-lg bg-indigo-900/80 hover:bg-indigo-800 border border-indigo-500/40 text-indigo-200 transition font-medium text-xs";
+      closeApiModal();
+    }
+
+    // -----------------------------------------------------------------
+    // 8. ON WINDOW LOAD
+    // -----------------------------------------------------------------
+    window.onload = function() {
+      initChart();
+      loadScenario('nominal');
+      
+      const savedKey = localStorage.getItem('victorious_gemini_key');
+      if (savedKey) {
+        document.getElementById('apiKeyBtn').innerText = "Gemini API: Connected";
+        document.getElementById('apiKeyBtn').className = "px-3 py-1.5 rounded-lg bg-emerald-950 border border-emerald-500/50 text-emerald-200 text-xs font-semibold";
+      }
+
+      // Start real-time graph and latency timer loops
+      setInterval(tickChart, 1000);
+      setInterval(tickLatency, 1000);
+    };
+  </script>
+
+</body>
+</html>
