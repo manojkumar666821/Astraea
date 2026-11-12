@@ -579,6 +579,12 @@
         <span id="wiredBusLabel">Wired Sensor Bus: OFF</span>
       </button>
 
+      <!-- Autonomous Fail-Safe Toggle -->
+      <button class="btn btn-bus streaming" id="btnAutoMode" onclick="toggleAutoMode()">
+        <span class="status-dot"></span>
+        <span id="autoModeLabel">Auto-Response: ON</span>
+      </button>
+
       <!-- Simulators & Anomaly Injectors -->
       <div class="dropdown" id="simDropdown">
         <button class="btn btn-primary" onclick="toggleDropdown(event)">
@@ -783,6 +789,8 @@
     let phase = 0;
     let isWiredConnected = false;
     let isDataStreaming = false;
+    let isAutoActuationEnabled = true;
+    let autoActuationTimer = null;
     let activeCrewName = localStorage.getItem('astraea_crew_name') || 'CDR. Alex Vance';
     let logCache = JSON.parse(localStorage.getItem('astraea_logs') || '[]');
 
@@ -797,6 +805,20 @@
       const input = document.getElementById('crewNameInput');
       activeCrewName = input.value.trim() || 'Astronaut';
       localStorage.setItem('astraea_crew_name', activeCrewName);
+    }
+
+    function toggleAutoMode() {
+      isAutoActuationEnabled = !isAutoActuationEnabled;
+      const btn = document.getElementById('btnAutoMode');
+      const label = document.getElementById('autoModeLabel');
+      if (isAutoActuationEnabled) {
+        btn.className = 'btn btn-bus streaming';
+        label.innerText = 'Auto-Response: ON';
+      } else {
+        btn.className = 'btn btn-bus';
+        label.innerText = 'Auto-Response: MANUAL';
+        clearTimeout(autoActuationTimer);
+      }
     }
 
     // --- 2. Chart Initializer with Multi-CDN Fallback ---
@@ -922,14 +944,23 @@
         diagTitle.innerText = 'Toxic Hypercapnia Risk (NASA-STD-3001)';
         diagDetails.innerText = 'ppCO2 levels breach maximum allowable threshold (3.0 mmHg). Immediate carbon scrub required.';
         
-        actionHead.innerText = 'URGENT: OVERRIDE ECLSS SCRUBBERS';
-        actionDesc.innerText = 'Trigger LiOH Scrubber Loop 2 from the Suit Actuator panel below to purge cabin CO2.';
+        actionHead.innerText = isAutoActuationEnabled ? 'AUTONOMOUS OVERRIDE TRIGGERED...' : 'URGENT: OVERRIDE ECLSS SCRUBBERS';
+        actionDesc.innerText = isAutoActuationEnabled 
+          ? 'Auto-Response active: Automatically engaging LiOH Scrubber Loop 2 in 2 seconds...' 
+          : 'Trigger LiOH Scrubber Loop 2 from the Suit Actuator panel below to purge cabin CO2.';
         actionBox.classList.add('action-blink');
 
         const actBtn = document.getElementById('actScrubber');
         actBtn.classList.add('active-action');
-        document.getElementById('statusScrubber').innerText = '⚠ [DIRECTIVE: CLICK TO OVERRIDE]';
+        document.getElementById('statusScrubber').innerText = isAutoActuationEnabled ? '⚡ AUTO-ENGAGING LOOP 2...' : '⚠ [DIRECTIVE: CLICK TO OVERRIDE]';
         playBeepAudio(880, 0.15);
+
+        if (isAutoActuationEnabled && !autoActuationTimer) {
+          autoActuationTimer = setTimeout(() => {
+            executeActuator('scrubber');
+            autoActuationTimer = null;
+          }, 2200);
+        }
         return;
       }
 
@@ -945,14 +976,23 @@
         diagTitle.innerText = 'Hypobaric Decompression Alert';
         diagDetails.innerText = 'Suit pressure has dropped below nominal threshold (97.0 kPa). Early arterial hypoxia detected.';
 
-        actionHead.innerText = 'CRITICAL: SEAL SPACESUIT';
-        actionDesc.innerText = 'Deploy suit seal actuators immediately to repressurize helmet and maintain arterial saturation.';
+        actionHead.innerText = isAutoActuationEnabled ? 'AUTONOMOUS SUIT SEAL TRIGGERED...' : 'CRITICAL: SEAL SPACESUIT';
+        actionDesc.innerText = isAutoActuationEnabled
+          ? 'Auto-Response active: Automatically deploying suit seal & 100% O2 purge in 2 seconds...'
+          : 'Deploy suit seal actuators immediately to repressurize helmet and maintain arterial saturation.';
         actionBox.classList.add('action-blink');
 
         const actBtn = document.getElementById('actSeal');
         actBtn.classList.add('active-action');
-        document.getElementById('statusSeal').innerText = '⚠ [DIRECTIVE: CLICK TO SEAL]';
+        document.getElementById('statusSeal').innerText = isAutoActuationEnabled ? '⚡ AUTO-SEALING SUIT...' : '⚠ [DIRECTIVE: CLICK TO SEAL]';
         playBeepAudio(1046, 0.2);
+
+        if (isAutoActuationEnabled && !autoActuationTimer) {
+          autoActuationTimer = setTimeout(() => {
+            executeActuator('seal');
+            autoActuationTimer = null;
+          }, 2200);
+        }
         return;
       }
 
@@ -963,12 +1003,21 @@
         diagTitle.innerText = 'High Metabolic Exertion (EVA Strain)';
         diagDetails.innerText = 'Elevated cardiac exertion noted. Suit internal pressure and gas balance remain safe.';
 
-        actionHead.innerText = 'ADVISORY: BOOST COOLING GARMENT';
-        actionDesc.innerText = 'Engage maximum LCG flow rate to disperse core heat and prevent thermal exhaustion.';
+        actionHead.innerText = isAutoActuationEnabled ? 'AUTONOMOUS COOLING BOOST ENGAGED' : 'ADVISORY: BOOST COOLING GARMENT';
+        actionDesc.innerText = isAutoActuationEnabled
+          ? 'Auto-Response active: Liquid Cooling Garment flow boosted to disperse metabolic heat.'
+          : 'Engage maximum LCG flow rate to disperse core heat and prevent thermal exhaustion.';
 
         const actBtn = document.getElementById('actCooling');
         actBtn.classList.add('active-action');
-        document.getElementById('statusCooling').innerText = '⚠ [ADVISORY: CLICK TO BOOST]';
+        document.getElementById('statusCooling').innerText = isAutoActuationEnabled ? '⚡ AUTO-BOOSTING LCG FLOW...' : '⚠ [ADVISORY: CLICK TO BOOST]';
+
+        if (isAutoActuationEnabled && !autoActuationTimer) {
+          autoActuationTimer = setTimeout(() => {
+            executeActuator('cooling');
+            autoActuationTimer = null;
+          }, 2200);
+        }
         return;
       }
 
@@ -1091,6 +1140,8 @@
     function clearTelemetry() {
       closeDropdown();
       clearInterval(telemetryInterval);
+      clearTimeout(autoActuationTimer);
+      autoActuationTimer = null;
 
       document.getElementById('valHR').innerText = '--';
       document.getElementById('valSpO2').innerText = '--';
