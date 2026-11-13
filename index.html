@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <!-- Primary Chart.js CDN with failover -->
+  <!-- Primary Chart.js CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
 
   <style>
@@ -18,9 +18,13 @@
       font-family: 'Poppins', sans-serif;
     }
 
+    html {
+      scroll-behavior: smooth;
+    }
+
     body {
-      background-color: #060913;
-      color: #e2e8f0;
+      background-color: #070a14; /* Deep midnight cosmic background */
+      color: #f8fafc;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
@@ -32,31 +36,31 @@
       position: sticky;
       top: 0;
       z-index: 1000;
-      background: linear-gradient(90deg, #991b1b, #dc2626);
+      background: linear-gradient(90deg, #7f1d1d, #dc2626);
       color: #ffffff;
       padding: 10px 20px;
       text-align: center;
-      font-weight: 600;
+      font-weight: 700;
       font-size: 13px;
       letter-spacing: 0.5px;
-      box-shadow: 0 4px 15px rgba(220, 38, 38, 0.4);
+      box-shadow: 0 4px 20px rgba(220, 38, 38, 0.6);
       animation: pulseAlert 1.2s infinite alternate;
     }
 
     @keyframes pulseAlert {
-      from { background-color: #991b1b; }
-      to { background-color: #ef4444; }
+      from { background-color: #7f1d1d; }
+      to { background-color: #dc2626; }
     }
 
     /* Header */
     header {
-      background-color: #0c1222;
-      border-bottom: 1px solid #1e293b;
-      padding: 20px 32px;
+      background-color: #0b132b;
+      border-bottom: 1px solid rgba(139, 92, 246, 0.3);
+      padding: 18px 32px;
       display: flex;
       flex-direction: column;
       align-items: flex-start;
-      gap: 16px;
+      gap: 14px;
       position: relative;
       z-index: 50;
     }
@@ -66,7 +70,7 @@
       align-items: center;
       gap: 8px;
       font-size: 12px;
-      font-weight: 500;
+      font-weight: 600;
       color: #38bdf8;
       letter-spacing: 0.5px;
       margin-bottom: 4px;
@@ -86,6 +90,7 @@
       font-weight: 700;
       color: #ffffff;
       line-height: 1.2;
+      text-shadow: 0 0 15px rgba(56, 189, 248, 0.35);
     }
 
     .title-group p {
@@ -99,43 +104,50 @@
       font-weight: 600;
     }
 
+    /* Clean Single-Line Header Controls */
     .header-actions {
       display: flex;
       align-items: center;
       flex-wrap: wrap;
-      gap: 12px;
-      position: relative;
+      gap: 10px;
+      width: 100%;
     }
 
     .btn {
-      padding: 8px 16px;
-      border-radius: 6px;
-      font-size: 13px;
-      font-weight: 500;
+      padding: 8px 14px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 600;
       cursor: pointer;
       border: 1px solid transparent;
       display: inline-flex;
       align-items: center;
       gap: 8px;
       transition: all 0.2s ease;
+      white-space: nowrap;
     }
 
     .btn-bus {
-      background-color: #0f172a;
+      background-color: #131b3a;
       color: #94a3b8;
-      border-color: #334155;
+      border-color: rgba(56, 189, 248, 0.25);
+    }
+
+    .btn-bus:hover {
+      border-color: rgba(56, 189, 248, 0.5);
+      color: #f8fafc;
     }
 
     .btn-bus.listening {
-      background-color: #422006;
-      color: #fde047;
-      border-color: #ca8a04;
+      background-color: #2e1065;
+      color: #e879f9;
+      border-color: rgba(232, 121, 249, 0.5);
     }
 
     .btn-bus.streaming {
-      background-color: #064e3b;
+      background-color: rgba(6, 78, 59, 0.85);
       color: #34d399;
-      border-color: #059669;
+      border-color: rgba(52, 211, 153, 0.5);
     }
 
     .status-dot {
@@ -143,17 +155,18 @@
       height: 8px;
       border-radius: 50%;
       background-color: #64748b;
+      flex-shrink: 0;
     }
 
     .listening .status-dot {
-      background-color: #fde047;
-      box-shadow: 0 0 8px #fde047;
+      background-color: #e879f9;
+      box-shadow: 0 0 10px #e879f9;
       animation: pulseDot 1s infinite alternate;
     }
 
     .streaming .status-dot {
       background-color: #34d399;
-      box-shadow: 0 0 8px #34d399;
+      box-shadow: 0 0 10px #34d399;
       animation: pulseDot 1.5s infinite alternate;
     }
 
@@ -163,17 +176,22 @@
     }
 
     .btn-primary {
-      background-color: #0284c7;
+      background: linear-gradient(135deg, #4f46e5, #7c3aed);
       color: #ffffff;
+      border: 1px solid rgba(139, 92, 246, 0.5);
+      box-shadow: 0 4px 15px rgba(124, 58, 237, 0.35);
     }
-    .btn-primary:hover { background-color: #0369a1; }
+    .btn-primary:hover { opacity: 0.92; }
 
     .btn-secondary {
-      background-color: #1e293b;
+      background-color: rgba(30, 41, 59, 0.75);
       color: #cbd5e1;
-      border-color: #334155;
+      border-color: rgba(71, 85, 105, 0.6);
     }
-    .btn-secondary:hover { background-color: #334155; }
+    .btn-secondary:hover {
+      background-color: rgba(51, 65, 85, 0.9);
+      color: #ffffff;
+    }
 
     /* Dropdown Menus */
     .dropdown {
@@ -188,11 +206,12 @@
       top: calc(100% + 6px);
       background-color: #0f172a;
       min-width: 260px;
-      border: 1px solid #334155;
-      border-radius: 8px;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(139, 92, 246, 0.45);
+      border-radius: 14px;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.8);
       z-index: 200;
       overflow: hidden;
+      backdrop-filter: blur(12px);
     }
 
     .dropdown-content button {
@@ -203,21 +222,22 @@
       border: none;
       color: #cbd5e1;
       font-size: 12px;
+      font-weight: 500;
       cursor: pointer;
       display: flex;
       flex-direction: column;
       gap: 2px;
-      border-bottom: 1px solid #1e293b;
+      border-bottom: 1px solid rgba(30, 41, 59, 0.7);
     }
 
     .dropdown-content button:hover {
-      background-color: #1e293b;
+      background-color: rgba(139, 92, 246, 0.25);
       color: #38bdf8;
     }
 
     .dropdown-content button span.subtitle {
       font-size: 10px;
-      color: #64748b;
+      color: #94a3b8;
     }
 
     .dropdown.active .dropdown-content {
@@ -226,7 +246,7 @@
 
     /* Main Container */
     main {
-      padding: 20px 32px;
+      padding: 18px 32px;
       flex: 1;
       max-width: 1600px;
       margin: 0 auto;
@@ -235,16 +255,18 @@
 
     /* Crew Identity Ribbon */
     .crew-ribbon {
-      background-color: #0c1222;
-      border: 1px solid #1e293b;
-      border-radius: 8px;
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.85), rgba(30, 27, 75, 0.85));
+      border: 1px solid rgba(139, 92, 246, 0.3);
+      border-radius: 14px;
       padding: 12px 20px;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
       gap: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+      backdrop-filter: blur(10px);
     }
 
     .crew-identity {
@@ -255,43 +277,140 @@
 
     .crew-identity span.label {
       font-size: 11px;
-      color: #64748b;
+      color: #94a3b8;
+      font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
 
     .crew-identity input {
-      background-color: #060913;
-      border: 1px solid #334155;
-      color: #38bdf8;
+      background-color: rgba(7, 10, 20, 0.85);
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      color: #ffffff;
       font-weight: 600;
-      font-size: 14px;
-      padding: 4px 10px;
-      border-radius: 4px;
+      font-size: 13px;
+      padding: 5px 12px;
+      border-radius: 8px;
       outline: none;
       width: 200px;
     }
 
     .crew-identity input:focus {
       border-color: #38bdf8;
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.35);
     }
 
     .crew-metadata {
       display: flex;
       gap: 20px;
       font-size: 12px;
-      color: #94a3b8;
-    }
-
-    .crew-metadata strong {
       color: #cbd5e1;
     }
 
-    /* 2x2 Matrix Grid with integrated values */
+    .crew-metadata strong {
+      color: #38bdf8;
+      font-weight: 600;
+    }
+
+    /* Elevated Autonomous Clinical Evaluation Bar */
+    .evaluation-banner {
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(11, 19, 43, 0.95));
+      border: 1px solid rgba(139, 92, 246, 0.3);
+      border-left: 5px solid #38bdf8;
+      border-radius: 14px;
+      padding: 15px 22px;
+      margin-bottom: 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.4);
+      transition: all 0.3s ease;
+    }
+
+    .evaluation-banner.critical-eval {
+      background: linear-gradient(135deg, rgba(69, 10, 10, 0.92), rgba(30, 10, 15, 0.95));
+      border-color: #ef4444;
+      border-left: 5px solid #ef4444;
+      box-shadow: 0 0 25px rgba(239, 68, 68, 0.4);
+    }
+
+    .evaluation-banner.advisory-eval {
+      background: linear-gradient(135deg, rgba(66, 32, 6, 0.92), rgba(25, 18, 10, 0.95));
+      border-color: #f59e0b;
+      border-left: 5px solid #f59e0b;
+    }
+
+    .eval-main {
+      flex: 1;
+      min-width: 260px;
+    }
+
+    .eval-tag {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #38bdf8;
+      margin-bottom: 2px;
+    }
+
+    .critical-eval .eval-tag {
+      color: #fca5a5;
+    }
+
+    .advisory-eval .eval-tag {
+      color: #fcd34d;
+    }
+
+    .eval-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .eval-desc {
+      font-size: 12px;
+      color: #94a3b8;
+      margin-top: 3px;
+      line-height: 1.4;
+    }
+
+    .critical-eval .eval-desc {
+      color: #fecaca;
+    }
+
+    .eval-badge {
+      background-color: rgba(7, 10, 20, 0.8);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      padding: 8px 14px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #38bdf8;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+    }
+
+    .critical-eval .eval-badge {
+      background-color: #991b1b;
+      border-color: #ef4444;
+      color: #ffffff;
+      animation: pulseAlert 1s infinite alternate;
+    }
+
+    .advisory-eval .eval-badge {
+      background-color: #78350f;
+      border-color: #f59e0b;
+      color: #fef3c7;
+    }
+
+    /* 2x2 Matrix Grid with Integrated Values */
     .charts-matrix {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 16px;
+      gap: 18px;
       margin-bottom: 20px;
     }
 
@@ -300,19 +419,22 @@
     }
 
     .chart-box {
-      background-color: #0c1222;
-      border: 1px solid #1e293b;
-      border-radius: 8px;
-      padding: 16px 20px;
+      background: linear-gradient(145deg, rgba(15, 23, 42, 0.85), rgba(11, 19, 43, 0.92));
+      border: 1px solid rgba(139, 92, 246, 0.25);
+      border-radius: 18px;
+      padding: 18px 22px;
       display: flex;
       flex-direction: column;
       position: relative;
-      transition: border-color 0.2s, background-color 0.2s;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(12px);
+      transition: border-color 0.2s, box-shadow 0.2s;
     }
 
     .chart-box.alert-border {
       border-color: #ef4444;
-      background-color: #1f1015;
+      background: linear-gradient(145deg, rgba(43, 17, 21, 0.9), rgba(15, 23, 42, 0.95));
+      box-shadow: 0 0 25px rgba(239, 68, 68, 0.4);
     }
 
     .chart-header {
@@ -325,12 +447,12 @@
     .chart-header .title-area h3 {
       font-size: 13px;
       font-weight: 600;
-      color: #cbd5e1;
+      color: #f8fafc;
     }
 
     .chart-header .title-area span {
       font-size: 10px;
-      color: #64748b;
+      color: #94a3b8;
     }
 
     .chart-header .val-area {
@@ -338,42 +460,59 @@
     }
 
     .chart-header .val-area .numeric-val {
-      font-size: 26px;
+      font-size: 28px;
       font-weight: 700;
-      color: #ffffff;
+      color: #38bdf8;
       line-height: 1;
       font-variant-numeric: tabular-nums;
+      text-shadow: 0 0 12px rgba(56, 189, 248, 0.4);
+    }
+
+    .alert-border .val-area .numeric-val {
+      color: #f87171;
+      text-shadow: 0 0 12px rgba(248, 113, 113, 0.5);
     }
 
     .chart-header .val-area .unit-label {
       font-size: 10px;
-      color: #94a3b8;
+      color: #a855f7;
       text-transform: uppercase;
+      font-weight: 600;
+      margin-top: 2px;
     }
 
     .chart-container {
       position: relative;
-      height: 160px;
+      height: 155px;
       width: 100%;
     }
 
     /* Suit Actuators Panel */
     .actuators-card {
-      background-color: #0c1222;
-      border: 1px solid #1e293b;
-      border-radius: 8px;
-      padding: 16px 20px;
-      margin-bottom: 20px;
+      background: linear-gradient(145deg, rgba(15, 23, 42, 0.85), rgba(11, 19, 43, 0.92));
+      border: 1px solid rgba(139, 92, 246, 0.25);
+      border-radius: 18px;
+      padding: 18px 22px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(12px);
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    .actuators-card.highlight-panel {
+      border-color: #ef4444;
+      box-shadow: 0 0 30px rgba(239, 68, 68, 0.45);
     }
 
     .actuators-card h3 {
       font-size: 13px;
       font-weight: 600;
-      color: #38bdf8;
+      color: #f8fafc;
       margin-bottom: 12px;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
     }
 
     .actuator-grid {
@@ -387,10 +526,10 @@
     }
 
     .btn-actuator {
-      background-color: #060913;
-      border: 1px solid #1e293b;
-      border-radius: 6px;
-      padding: 10px 14px;
+      background-color: rgba(30, 41, 59, 0.65);
+      border: 1px solid rgba(51, 65, 85, 0.8);
+      border-radius: 12px;
+      padding: 12px 14px;
       color: #cbd5e1;
       cursor: pointer;
       text-align: left;
@@ -403,89 +542,49 @@
     }
 
     .btn-actuator:hover {
-      background-color: #1e293b;
-      border-color: #334155;
+      background-color: rgba(139, 92, 246, 0.2);
+      border-color: #8b5cf6;
+      color: #ffffff;
     }
 
     .btn-actuator span.status {
       font-size: 10px;
-      color: #64748b;
+      color: #94a3b8;
     }
 
     .btn-actuator.active-action {
       border-color: #ef4444;
-      background-color: #2b1115;
+      background-color: rgba(127, 29, 29, 0.55);
       color: #fecaca;
       animation: actuatorPulse 1s infinite alternate;
     }
 
-    @keyframes actuatorPulse {
-      from { box-shadow: 0 0 4px rgba(220, 38, 38, 0.3); border-color: #dc2626; }
-      to { box-shadow: 0 0 14px rgba(239, 68, 68, 0.6); border-color: #f87171; }
-    }
-
-    /* Decision Area */
-    .decision-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-    }
-
-    @media (max-width: 768px) {
-      .decision-grid { grid-template-columns: 1fr; }
-    }
-
-    .decision-card {
-      background-color: #0c1222;
-      border: 1px solid #1e293b;
-      border-radius: 8px;
-      padding: 16px 20px;
-    }
-
-    .decision-card h3 {
-      font-size: 13px;
+    .btn-actuator.active-action span.status {
+      color: #ffffff;
       font-weight: 600;
-      margin-bottom: 10px;
-      color: #38bdf8;
     }
 
-    .action-directive-box {
-      padding: 14px;
-      border-radius: 6px;
-      background-color: #060913;
-      border-left: 4px solid #334155;
-      font-size: 12px;
-      line-height: 1.5;
-      color: #94a3b8;
-    }
-
-    .action-blink {
-      background-color: #2b1115 !important;
-      border-left: 4px solid #ef4444 !important;
-      color: #fecaca !important;
-      animation: directiveBlink 1s infinite alternate;
-    }
-
-    @keyframes directiveBlink {
-      from { border-left-color: #dc2626; box-shadow: 0 0 4px rgba(220,38,38,0.2); }
-      to { border-left-color: #f87171; box-shadow: 0 0 12px rgba(239,68,68,0.5); }
+    @keyframes actuatorPulse {
+      from { box-shadow: 0 0 10px rgba(239, 68, 68, 0.4); }
+      to { box-shadow: 0 0 22px rgba(239, 68, 68, 0.85); }
     }
 
     /* Mission BlackBox Log Drawer */
     #storageDrawer {
       position: fixed;
-      top: 48px;
+      top: 0;
       right: -420px;
       width: 400px;
-      height: calc(100vh - 48px);
-      background-color: #0c1222;
-      border-left: 1px solid #1e293b;
-      z-index: 500;
+      height: 100vh;
+      background-color: #0b132b;
+      border-left: 1px solid rgba(139, 92, 246, 0.4);
+      z-index: 1100;
       padding: 20px;
       display: flex;
       flex-direction: column;
       transition: right 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: -10px 0 30px rgba(0,0,0,0.6);
+      box-shadow: -15px 0 40px rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(16px);
     }
 
     #storageDrawer.open {
@@ -498,15 +597,15 @@
       align-items: center;
       margin-bottom: 12px;
       padding-bottom: 10px;
-      border-bottom: 1px solid #1e293b;
+      border-bottom: 1px solid rgba(51, 65, 85, 0.8);
     }
 
     .close-log-btn {
       background-color: #ef4444;
       color: #ffffff;
       border: none;
-      padding: 5px 12px;
-      border-radius: 5px;
+      padding: 6px 14px;
+      border-radius: 8px;
       font-size: 12px;
       font-weight: 600;
       cursor: pointer;
@@ -518,10 +617,10 @@
       flex: 1;
       overflow-y: auto;
       font-size: 11px;
-      background-color: #060913;
-      border: 1px solid #1e293b;
-      border-radius: 6px;
-      padding: 10px;
+      background-color: #070a14;
+      border: 1px solid rgba(51, 65, 85, 0.8);
+      border-radius: 10px;
+      padding: 12px;
       color: #38bdf8;
       font-family: monospace;
       white-space: pre-wrap;
@@ -534,8 +633,8 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0,0,0,0.4);
-      z-index: 450;
+      background: rgba(0, 0, 0, 0.65);
+      z-index: 1050;
     }
 
     #drawerBackdrop.show {
@@ -543,17 +642,17 @@
     }
 
     footer {
-      background-color: #060913;
-      border-top: 1px solid #1e293b;
+      background-color: #0b132b;
+      border-top: 1px solid rgba(139, 92, 246, 0.25);
       padding: 14px 32px;
       text-align: center;
       font-size: 11px;
-      color: #64748b;
-      margin-top: 20px;
+      color: #94a3b8;
+      margin-top: 24px;
     }
 
     footer strong {
-      color: #94a3b8;
+      color: #38bdf8;
     }
   </style>
 </head>
@@ -607,7 +706,7 @@
             <span>4. Heavy EVA Exertion</span>
             <span class="subtitle">Elevated Vitals, Safe Pressure</span>
           </button>
-          <button onclick="clearTelemetry()" style="color: #ef4444;">
+          <button onclick="clearTelemetry()" style="color: #f87171;">
             <span>✖ Disconnect Telemetry</span>
             <span class="subtitle">Reset to standby (-- values)</span>
           </button>
@@ -635,7 +734,17 @@
       </div>
     </div>
 
-    <!-- 2x2 Matrix Grid with Integrated Values -->
+    <!-- Elevated Autonomous Clinical Evaluation Bar -->
+    <div class="evaluation-banner" id="evalBanner">
+      <div class="eval-main">
+        <div class="eval-tag">Autonomous Clinical Evaluation (NASA-STD-3001)</div>
+        <div class="eval-title" id="diagTitle">Awaiting Telemetry Feed</div>
+        <div class="eval-desc" id="diagDetails">Connect wired sensor bus or select a simulator scenario to initiate real-time clinical cross-correlation.</div>
+      </div>
+      <div class="eval-badge" id="evalStatusBadge">STANDBY</div>
+    </div>
+
+    <!-- 2x2 Matrix Graph Layout with Integrated Values -->
     <div class="charts-matrix">
       <!-- (1,1) Heart Rate -->
       <div class="chart-box" id="cardHR">
@@ -706,11 +815,11 @@
       </div>
     </div>
 
-    <!-- Suit Actuators Panel -->
-    <div class="actuators-card">
+    <!-- Suit Actuators Panel (Auto-Scroll Target on Anomaly) -->
+    <div class="actuators-card" id="actuatorsPanel">
       <h3>
         <span>Spacesuit Life-Support Actuators (Hardware Telecommand)</span>
-        <span style="font-size: 11px; color: #64748b;">Direct Telecommand Bus</span>
+        <span style="font-size: 11px; color: #38bdf8;" id="actuatorBusLabel">Auto-Execution Active</span>
       </h3>
       <div class="actuator-grid">
         <button class="btn-actuator" id="actScrubber" onclick="executeActuator('scrubber')">
@@ -732,34 +841,6 @@
           <span style="font-weight: 600;">Auto-Medication Injector</span>
           <span class="status" id="statusMed">Status: ARMED (REQUIRES DIRECTIVE)</span>
         </button>
-      </div>
-    </div>
-
-    <!-- Decision Area -->
-    <div class="decision-grid">
-      <div class="decision-card">
-        <h3>Autonomous Clinical Evaluation</h3>
-        <div style="margin-bottom: 6px;">
-          <strong style="font-size: 11px; color: #64748b;">Diagnostic Assessment:</strong>
-          <div id="diagTitle" style="font-size: 15px; font-weight: 600; color: #ffffff; margin-top: 2px;">
-            Awaiting Telemetry Feed
-          </div>
-        </div>
-        <p id="diagDetails" style="font-size: 12px; color: #94a3b8; line-height: 1.5;">
-          Connect wired sensor bus or select a simulator scenario to initiate clinical cross-correlation.
-        </p>
-      </div>
-
-      <div class="decision-card">
-        <h3>Immediate Action Directive</h3>
-        <div class="action-directive-box" id="actionDirectiveBox">
-          <strong id="actionHeading" style="display: block; font-size: 13px; color: #cbd5e1; margin-bottom: 2px;">
-            Standby State
-          </strong>
-          <span id="actionDescription">
-            No emergency detected. Awaiting telemetry stream.
-          </span>
-        </div>
       </div>
     </div>
   </main>
@@ -788,9 +869,9 @@
     let telemetryInterval = null;
     let phase = 0;
     let isWiredConnected = false;
-    let isDataStreaming = false;
     let isAutoActuationEnabled = true;
     let autoActuationTimer = null;
+    let autoScrollTriggered = false;
     let activeCrewName = localStorage.getItem('astraea_crew_name') || 'CDR. Alex Vance';
     let logCache = JSON.parse(localStorage.getItem('astraea_logs') || '[]');
 
@@ -811,13 +892,17 @@
       isAutoActuationEnabled = !isAutoActuationEnabled;
       const btn = document.getElementById('btnAutoMode');
       const label = document.getElementById('autoModeLabel');
+      const busLabel = document.getElementById('actuatorBusLabel');
       if (isAutoActuationEnabled) {
         btn.className = 'btn btn-bus streaming';
         label.innerText = 'Auto-Response: ON';
+        busLabel.innerText = 'Auto-Execution Active';
       } else {
         btn.className = 'btn btn-bus';
         label.innerText = 'Auto-Response: MANUAL';
+        busLabel.innerText = 'Manual Telecommand Mode';
         clearTimeout(autoActuationTimer);
+        autoActuationTimer = null;
       }
     }
 
@@ -838,7 +923,7 @@
         const canvas = document.getElementById(canvasId);
         if (!canvas) return null;
         const ctx = canvas.getContext('2d');
-        const gradient = ctx.createLinearGradient(0, 0, 0, 160);
+        const gradient = ctx.createLinearGradient(0, 0, 0, 155);
         gradient.addColorStop(0, color + '33');
         gradient.addColorStop(1, color + '00');
 
@@ -917,18 +1002,29 @@
       saveLog(vitals);
     }
 
-    // --- 4. NASA Clinical Rules & Anomaly Alerting ---
+    // --- 4. NASA Clinical Rules, Auto-Scroll & Auto-Actuation ---
+    function scrollToActuators() {
+      if (!autoScrollTriggered) {
+        autoScrollTriggered = true;
+        const panel = document.getElementById('actuatorsPanel');
+        if (panel) {
+          panel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }
+    }
+
     function evaluateClinicalState(v) {
       const topBanner = document.getElementById('emergencyTopBanner');
-      const actionBox = document.getElementById('actionDirectiveBox');
+      const evalBanner = document.getElementById('evalBanner');
+      const evalBadge = document.getElementById('evalStatusBadge');
       const diagTitle = document.getElementById('diagTitle');
       const diagDetails = document.getElementById('diagDetails');
-      const actionHead = document.getElementById('actionHeading');
-      const actionDesc = document.getElementById('actionDescription');
+      const actuatorsPanel = document.getElementById('actuatorsPanel');
 
       // Reset indicators
       topBanner.style.display = 'none';
-      actionBox.classList.remove('action-blink');
+      evalBanner.className = 'evaluation-banner';
+      actuatorsPanel.classList.remove('highlight-panel');
       document.querySelectorAll('.chart-box').forEach(c => c.classList.remove('alert-border'));
       document.querySelectorAll('.btn-actuator').forEach(b => b.classList.remove('active-action'));
 
@@ -936,24 +1032,26 @@
       if (v.co2 >= 3.5) {
         document.getElementById('cardCO2').classList.add('alert-border');
         document.getElementById('cardHR').classList.add('alert-border');
-        
+        actuatorsPanel.classList.add('highlight-panel');
+
         topBanner.style.display = 'block';
         document.getElementById('bannerDiagnosisText').innerText = `ACUTE HYPERCAPNIA (${v.co2} mmHg)`;
-        document.getElementById('bannerActionText').innerText = 'MANUAL OVERRIDE SCRUBBER LOOP 2';
+        document.getElementById('bannerActionText').innerText = 'ENGAGE LIOH SCRUBBER LOOP 2';
 
-        diagTitle.innerText = 'Toxic Hypercapnia Risk (NASA-STD-3001)';
-        diagDetails.innerText = 'ppCO2 levels breach maximum allowable threshold (3.0 mmHg). Immediate carbon scrub required.';
-        
-        actionHead.innerText = isAutoActuationEnabled ? 'AUTONOMOUS OVERRIDE TRIGGERED...' : 'URGENT: OVERRIDE ECLSS SCRUBBERS';
-        actionDesc.innerText = isAutoActuationEnabled 
-          ? 'Auto-Response active: Automatically engaging LiOH Scrubber Loop 2 in 2 seconds...' 
-          : 'Trigger LiOH Scrubber Loop 2 from the Suit Actuator panel below to purge cabin CO2.';
-        actionBox.classList.add('action-blink');
+        evalBanner.classList.add('critical-eval');
+        evalBadge.innerText = 'CRITICAL ANOMALY';
+        diagTitle.innerText = 'Toxic Hypercapnia Risk (NASA-STD-3001 Breach)';
+        diagDetails.innerText = isAutoActuationEnabled
+          ? 'ppCO2 exceeds 3.0 mmHg safety threshold. Auto-Response engaging Secondary LiOH Scrubber Loop 2 to purge carbon dioxide.'
+          : 'ppCO2 exceeds 3.0 mmHg safety threshold. Click LiOH Scrubber Loop 2 below to purge cabin CO2 immediately.';
 
         const actBtn = document.getElementById('actScrubber');
         actBtn.classList.add('active-action');
-        document.getElementById('statusScrubber').innerText = isAutoActuationEnabled ? '⚡ AUTO-ENGAGING LOOP 2...' : '⚠ [DIRECTIVE: CLICK TO OVERRIDE]';
-        playBeepAudio(880, 0.15);
+        document.getElementById('statusScrubber').innerText = isAutoActuationEnabled
+          ? '⚡ AUTO-ENGAGING LOOP 2...'
+          : '⚠ [DIRECTIVE: CLICK TO OVERRIDE]';
+
+        scrollToActuators();
 
         if (isAutoActuationEnabled && !autoActuationTimer) {
           autoActuationTimer = setTimeout(() => {
@@ -968,24 +1066,26 @@
       if (v.pressure < 92.0 || v.spo2 < 93) {
         document.getElementById('cardPressure').classList.add('alert-border');
         document.getElementById('cardSpO2').classList.add('alert-border');
+        actuatorsPanel.classList.add('highlight-panel');
 
         topBanner.style.display = 'block';
         document.getElementById('bannerDiagnosisText').innerText = `CABIN DEPRESSURIZATION (${v.pressure} kPa)`;
-        document.getElementById('bannerActionText').innerText = 'SEAL SUIT / O2 PURGE';
+        document.getElementById('bannerActionText').innerText = 'DEPLOY SUIT SEAL & O2 PURGE';
 
-        diagTitle.innerText = 'Hypobaric Decompression Alert';
-        diagDetails.innerText = 'Suit pressure has dropped below nominal threshold (97.0 kPa). Early arterial hypoxia detected.';
-
-        actionHead.innerText = isAutoActuationEnabled ? 'AUTONOMOUS SUIT SEAL TRIGGERED...' : 'CRITICAL: SEAL SPACESUIT';
-        actionDesc.innerText = isAutoActuationEnabled
-          ? 'Auto-Response active: Automatically deploying suit seal & 100% O2 purge in 2 seconds...'
-          : 'Deploy suit seal actuators immediately to repressurize helmet and maintain arterial saturation.';
-        actionBox.classList.add('action-blink');
+        evalBanner.classList.add('critical-eval');
+        evalBadge.innerText = 'CRITICAL ANOMALY';
+        diagTitle.innerText = 'Hypobaric Decompression & Hypoxia Alert';
+        diagDetails.innerText = isAutoActuationEnabled
+          ? 'Suit pressure dropped below 97.0 kPa envelope. Auto-Response sealing suit valves and initiating 100% O2 purge.'
+          : 'Suit pressure dropped below 97.0 kPa envelope. Click Deploy Suit Seal / O2 Purge below to repressurize suit.';
 
         const actBtn = document.getElementById('actSeal');
         actBtn.classList.add('active-action');
-        document.getElementById('statusSeal').innerText = isAutoActuationEnabled ? '⚡ AUTO-SEALING SUIT...' : '⚠ [DIRECTIVE: CLICK TO SEAL]';
-        playBeepAudio(1046, 0.2);
+        document.getElementById('statusSeal').innerText = isAutoActuationEnabled
+          ? '⚡ AUTO-SEALING SUIT...'
+          : '⚠ [DIRECTIVE: CLICK TO SEAL]';
+
+        scrollToActuators();
 
         if (isAutoActuationEnabled && !autoActuationTimer) {
           autoActuationTimer = setTimeout(() => {
@@ -999,18 +1099,22 @@
       // 3. High Exertion
       if (v.hr > 125) {
         document.getElementById('cardHR').classList.add('alert-border');
+        actuatorsPanel.classList.add('highlight-panel');
 
+        evalBanner.classList.add('advisory-eval');
+        evalBadge.innerText = 'METABOLIC ADVISORY';
         diagTitle.innerText = 'High Metabolic Exertion (EVA Strain)';
-        diagDetails.innerText = 'Elevated cardiac exertion noted. Suit internal pressure and gas balance remain safe.';
-
-        actionHead.innerText = isAutoActuationEnabled ? 'AUTONOMOUS COOLING BOOST ENGAGED' : 'ADVISORY: BOOST COOLING GARMENT';
-        actionDesc.innerText = isAutoActuationEnabled
-          ? 'Auto-Response active: Liquid Cooling Garment flow boosted to disperse metabolic heat.'
-          : 'Engage maximum LCG flow rate to disperse core heat and prevent thermal exhaustion.';
+        diagDetails.innerText = isAutoActuationEnabled
+          ? 'Elevated cardiac exertion noted. Auto-Response boosting Liquid Cooling Garment (LCG) flow to disperse metabolic heat.'
+          : 'Elevated cardiac exertion noted. Click Liquid Cooling Garment (LCG) below to boost coolant flow.';
 
         const actBtn = document.getElementById('actCooling');
         actBtn.classList.add('active-action');
-        document.getElementById('statusCooling').innerText = isAutoActuationEnabled ? '⚡ AUTO-BOOSTING LCG FLOW...' : '⚠ [ADVISORY: CLICK TO BOOST]';
+        document.getElementById('statusCooling').innerText = isAutoActuationEnabled
+          ? '⚡ AUTO-BOOSTING LCG FLOW...'
+          : '⚠ [ADVISORY: CLICK TO BOOST]';
+
+        scrollToActuators();
 
         if (isAutoActuationEnabled && !autoActuationTimer) {
           autoActuationTimer = setTimeout(() => {
@@ -1022,20 +1126,18 @@
       }
 
       // Nominal Status
+      autoScrollTriggered = false;
+      evalBadge.innerText = 'NOMINAL';
       diagTitle.innerText = 'Nominal Flight Status';
       diagDetails.innerText = 'All biometrics and cabin atmospheric metrics reside within NASA-STD-3001 safety envelopes.';
-      actionHead.innerText = 'Routine Operations';
-      actionDesc.innerText = 'No intervention required. Spacesuit life-support loops functioning nominally.';
       document.getElementById('statusScrubber').innerText = 'Status: STANDBY (LOOP 1 ACTIVE)';
       document.getElementById('statusSeal').innerText = 'Status: UNSEALED (ATMOSPHERIC)';
       document.getElementById('statusCooling').innerText = 'Status: NOMINAL CIRCULATION';
       document.getElementById('statusMed').innerText = 'Status: ARMED (REQUIRES DIRECTIVE)';
     }
 
-    // --- 5. Suit Actuators Execution ---
+    // --- 5. Suit Actuators Execution (Silent & Smooth) ---
     function executeActuator(type) {
-      playBeepAudio(1200, 0.08);
-
       if (type === 'scrubber') {
         document.getElementById('statusScrubber').innerText = 'ENGAGED - LOOP 2 ACTIVE (PURGING CO2)';
         document.getElementById('actScrubber').classList.remove('active-action');
@@ -1051,26 +1153,12 @@
       } else if (type === 'cooling') {
         document.getElementById('statusCooling').innerText = 'BOOSTED - 100% CHILL FLOW ACTIVE';
         document.getElementById('actCooling').classList.remove('active-action');
+        setTimeout(() => {
+          if (telemetryInterval) setScenario('nominal');
+        }, 1500);
       } else if (type === 'med') {
         document.getElementById('statusMed').innerText = 'INJECTED - ATROPINE/SALINE DOSE COMPLETE';
         document.getElementById('actMed').classList.remove('active-action');
-      }
-    }
-
-    // Audio synthesizer for alarms
-    function playBeepAudio(freq, duration) {
-      try {
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-        gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.start();
-        osc.stop(audioCtx.currentTime + duration);
-      } catch (e) {
-        // AudioContext silent fallback
       }
     }
 
@@ -1081,24 +1169,19 @@
       closeDropdown();
 
       if (isWiredConnected) {
-        // Disconnect
         clearInterval(telemetryInterval);
         isWiredConnected = false;
-        isDataStreaming = false;
         btn.className = 'btn btn-bus';
         label.innerText = 'Wired Sensor Bus: OFF';
         clearTelemetry();
       } else {
-        // Connected & listening (no data yet)
         isWiredConnected = true;
-        isDataStreaming = false;
         btn.className = 'btn btn-bus listening';
         label.innerText = 'Wired Bus: LISTENING...';
 
+        document.getElementById('evalStatusBadge').innerText = 'LISTENING';
         document.getElementById('diagTitle').innerText = 'Sensor Bus Connected - Calibrating';
-        document.getElementById('diagDetails').innerText = 'Awaiting first telemetry data packet over physical suit wiring...';
-        document.getElementById('actionHeading').innerText = 'Waiting For Telemetry';
-        document.getElementById('actionDescription').innerText = 'No packet received yet. Select a condition from Telemetry Simulator to transmit packets.';
+        document.getElementById('diagDetails').innerText = 'Awaiting first telemetry data packet over physical suit wiring. Select a scenario from Telemetry Simulator to stream packets.';
       }
     }
 
@@ -1106,10 +1189,11 @@
     function setScenario(type) {
       closeDropdown();
       clearInterval(telemetryInterval);
+      clearTimeout(autoActuationTimer);
+      autoActuationTimer = null;
+      autoScrollTriggered = false;
 
-      // Transition hardware button to streaming state
       isWiredConnected = true;
-      isDataStreaming = true;
       const btn = document.getElementById('btnWiredBus');
       btn.className = 'btn btn-bus streaming';
       document.getElementById('wiredBusLabel').innerText = 'Wired Bus: RECEIVING DATA';
@@ -1140,8 +1224,15 @@
     function clearTelemetry() {
       closeDropdown();
       clearInterval(telemetryInterval);
+      telemetryInterval = null;
       clearTimeout(autoActuationTimer);
       autoActuationTimer = null;
+      autoScrollTriggered = false;
+      isWiredConnected = false;
+
+      const btn = document.getElementById('btnWiredBus');
+      btn.className = 'btn btn-bus';
+      document.getElementById('wiredBusLabel').innerText = 'Wired Sensor Bus: OFF';
 
       document.getElementById('valHR').innerText = '--';
       document.getElementById('valSpO2').innerText = '--';
@@ -1156,14 +1247,19 @@
       });
 
       document.getElementById('emergencyTopBanner').style.display = 'none';
-      document.getElementById('actionDirectiveBox').classList.remove('action-blink');
+      document.getElementById('evalBanner').className = 'evaluation-banner';
+      document.getElementById('evalStatusBadge').innerText = 'STANDBY';
+      document.getElementById('actuatorsPanel').classList.remove('highlight-panel');
       document.querySelectorAll('.chart-box').forEach(c => c.classList.remove('alert-border'));
       document.querySelectorAll('.btn-actuator').forEach(b => b.classList.remove('active-action'));
 
+      document.getElementById('statusScrubber').innerText = 'Status: STANDBY (LOOP 1 ACTIVE)';
+      document.getElementById('statusSeal').innerText = 'Status: UNSEALED (ATMOSPHERIC)';
+      document.getElementById('statusCooling').innerText = 'Status: NOMINAL CIRCULATION';
+      document.getElementById('statusMed').innerText = 'Status: ARMED (REQUIRES DIRECTIVE)';
+
       document.getElementById('diagTitle').innerText = 'Awaiting Telemetry Feed';
-      document.getElementById('diagDetails').innerText = 'System on standby. Connect wired sensor bus or select a simulator scenario.';
-      document.getElementById('actionHeading').innerText = 'Standby State';
-      document.getElementById('actionDescription').innerText = 'No emergency detected. Awaiting telemetry stream.';
+      document.getElementById('diagDetails').innerText = 'Connect wired sensor bus or select a simulator scenario to initiate real-time clinical cross-correlation.';
     }
 
     // --- 8. Mission BlackBox Logs & LocalStorage ---
